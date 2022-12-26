@@ -1,0 +1,45 @@
+name: Autocommunicate Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo-type:
+        description: "Repo type {all,imagestreams,templates,testimagestreams,testtemplates,testall}"
+        required: true
+        default: "testall"
+      issue-title:
+        description: "Title of the Issue to be created"
+        required: true
+        default: "Sample Issue"
+      issue-description:
+        description: "Description of the issue to be created"
+        required: true
+        default: "Sample Issue Description"
+
+jobs:
+  workflow-autocommunicate:
+    name: Workflow Test
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.x Part 1
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+
+      - name: Set up Python 3.x Part 2
+        run: |
+          # set up python requirements and scripts
+          python3 -m venv ve1
+          cd scripts && ../ve1/bin/pip3 install -r requirements.txt && cd ..
+          cd scripts && ../ve1/bin/python3 setup.py install && cd ..
+      
+      - name: Auto Communicate
+        id: auto_communicate
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+          ve1/bin/python3 scripts/library.py --repoType=${{github.event.inputs.repo-type}} --issueTitle="${{github.event.inputs.issue-title}}" --issueDescription="${{github.event.inputs.issue-description}}"
+          
