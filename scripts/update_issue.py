@@ -42,14 +42,24 @@ def getB64(content=""):
     content = content.decode('utf-8')
     return content
 
+def getSha(filename):
+    res = requests.get(filename).json()
+    if("sha" in res):
+        sha = res["sha"]
+    else:
+        sha = ""
+    return sha
+
 def update_file(filename="", content="", message="appending issue ids"):
     global ERROR
     global SUCCESS
     try:
+        sha = getSha(filename)
         content = getB64(content)
         method = "put"
         body = {"message": message,
-                "content": content
+                "content": content,
+                "sha":sha
                 }
         github_output = _make_gihub_request(method=method, url=filename, body=body, verbose=False)
         status, message = github_output[0], github_output[1]
