@@ -13,9 +13,11 @@ from update_issue import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--pr_url", help="Name of the yaml file which triggered this action")
+parser.add_argument("--branch", help="Source branch from where PR is generated")
 args = parser.parse_args()
 
 pr_url = args.pr_url
+source_branch = args.branch
 print("Received Data: ", pr_url)
 gFilename = "" # This will be used whie updating the issue.
 
@@ -23,8 +25,6 @@ try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
-
-
 
 imageStreamDict = {}
 templateDict = {}
@@ -208,14 +208,12 @@ def main():
     print("Calling the parse_yml_file function")
     outputs = parse_yml_file(fileContent=file_content) #Format List([repo-url, issue-list])
     final_file_content = file_content
-    final_file_content += "issue_id_list:\n"
+    final_file_content += "\nissue_id_list:\n"
     for output in outputs:
         repo_url, issue_list = output[0],output[1]
-        final_file_content += """
-        - f{repo_url} : f{issue_list}
-        """
+        final_file_content += f""" - {repo_url} : {issue_list}\n"""
     global gFilename
-    file_url = str(pr_url.split("/pulls")[0]) + "/contents/" + yml_file
+    file_url = str(pr_url.split("/pulls")[0]) + "/" + str(source_branch) + "/contents/" + str(yml_file)
     print("File URL : ", file_url)
     #final_file_content_yml = yaml.safe_load(final_file_content)
     is_updated = update_file(filename=file_url, content=final_file_content)

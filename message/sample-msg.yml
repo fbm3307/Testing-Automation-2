@@ -1,7 +1,4 @@
 title: Sample Test Title
 description: Sample Description
 comments: Sample Comment1
-recepient_type: testtemplatesissue_id_list:
-
-        - f{repo_url} : f{issue_list}
-        
+recepient_type: testtemplates
