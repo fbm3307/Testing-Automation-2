@@ -10,7 +10,7 @@ jobs:
   sample-issue-workflow:
     name: Issue Creation
     runs-on: ubuntu-20.04
-    if: "!contains(github.event.head_commit.message, '#donotexecute')"
+    if: "!contains(github.event.head_commit.message, 'donotexecute')"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
