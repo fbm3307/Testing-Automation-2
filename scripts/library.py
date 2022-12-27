@@ -171,16 +171,32 @@ def parse_yml_file(fileContent=None):
         pass
     elif(recepient_type == "all"):
         #Create issues in all repo (templates, image_stream)
-        pass
+        print("[+] Inside all")
+        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+        #output format : List([repo_name, issue_id_url])
+        print("[+] Executed in all")
+        return output
     elif(recepient_type == "templates"):
         #Create issues in all the repo present under templates
-        pass
+        print("[+] Inside templates")
+        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+        #output format : List([repo_name, issue_id_url])
+        print("[+] Executed in templates")
+        return output
     elif(recepient_type == "image_stream"):
         #Create issues in all the image_steram repo
-        pass
+        print("[+] Inside image_stream")
+        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+        #output format : List([repo_name, issue_id_url])
+        print("[+] Executed in image_stream")
+        return output
     elif(recepient_type == "testimagestreams"):
         #Create issues in test image_streams
-        pass
+        print("[+] Inside testimagestreams")
+        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+        #output format : List([repo_name, issue_id_url])
+        print("[+] Executed in testimagesteams")
+        return output
     elif(recepient_type == "testtemplates"):
         #Create issues in test templates
         print("[+] Inside testtemplates")
@@ -190,7 +206,11 @@ def parse_yml_file(fileContent=None):
         return output
     elif(recepient_type == "testall"):
         #Create issues in all test repos - image_stream and templates
-        pass
+        print("[+] Inside testall")
+        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+        #output format : List([repo_name, issue_id_url])
+        print("[+] Executed in testall")
+        return output
     else:
         #Throw error
         pass
