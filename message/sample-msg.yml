@@ -1,7 +1,4 @@
 title: Sample Test Title
 description: Sample Description
-comments: Sample Comment 1
+comments: Sample Comment 2
 recepient_type: testimagestreams
-issue_id_list:
- - fbm3307/test-learn : https://github.com/fbm3307/test-learn/issues/12
- - fbm3307/testimagestreams1 : https://github.com/fbm3307/testimagestreams1/issues/7
