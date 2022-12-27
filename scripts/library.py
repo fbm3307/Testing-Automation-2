@@ -213,7 +213,7 @@ def main():
         repo_url, issue_list = output[0],output[1]
         final_file_content += f""" - {repo_url} : {issue_list}\n"""
     global gFilename
-    file_url = str(pr_url.split("/pulls")[0]) + "/" + str(source_branch) + "/contents/" + str(yml_file)
+    file_url = str(pr_url.split("/pulls")[0]) + "/contents/" + str(yml_file) + "?ref=" + str(source_branch)
     print("File URL : ", file_url)
     #final_file_content_yml = yaml.safe_load(final_file_content)
     is_updated = update_file(filename=file_url, content=final_file_content)

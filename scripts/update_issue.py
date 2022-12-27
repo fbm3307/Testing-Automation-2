@@ -61,6 +61,8 @@ def update_file(filename="", content="", message="appending issue ids"):
                 "content": content,
                 "sha":sha
                 }
+        print("Filename in target : ", filename)
+        print("Sha Generated  : ", sha)
         github_output = _make_gihub_request(method=method, url=filename, body=body, verbose=False)
         status, message = github_output[0], github_output[1]
         if(status == ERROR):
