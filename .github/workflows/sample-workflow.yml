@@ -31,4 +31,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
-          ve1/bin/python3 scripts/library.py --pr_url="${{ github.event.pull_request._links.self.href }}"" --branch="${{github.head_ref}}"
+          ve1/bin/python3 scripts/library.py --pr_url="${{ github.event.pull_request._links.self.href }}" --branch="${{github.head_ref}}"
