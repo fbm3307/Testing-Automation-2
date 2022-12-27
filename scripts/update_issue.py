@@ -52,7 +52,7 @@ def getSha(filename):
         sha = ""
     return sha
 
-def update_file(filename="", content="", message="appending issue ids donotexecute"):
+def update_file(filename="", content="", message="appending issue ids [skip actions]"):
     global ERROR
     global SUCCESS
     try:
