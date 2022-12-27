@@ -44,7 +44,7 @@ def getB64(content=""):
     return content
 
 def getSha(filename):
-    filename = str(str(filename).split("?")[0]) # This is because github computes the SHA of latest commit, not from the current branch
+    #filename = str(str(filename).split("?")[0]) # This is because github computes the SHA of latest commit, not from the current branch
     res = requests.get(filename).json()
     if("sha" in res):
         sha = res["sha"]
