@@ -11,10 +11,11 @@ def _make_gihub_request(method="post", url="", body=None, params={}, headers={},
     output = [] # Format: ["status", "string message"]
     global ERROR
     global SUCCESS
-    GITHUB_BASE_URL = "https://api.github.com"
+    #GITHUB_BASE_URL = "https://api.github.com"
     headers.update({"Authorization": f'Bearer {os.environ["GITHUB_TOKEN"]}',
                     "Accept": "application/vnd.github.v3+json"})    
     request_method = requests.put
+    print("URL in make_github_request : ",url)
     response = request_method(url, params=params, headers=headers, json=body)
     try:
         response.raise_for_status()
@@ -43,6 +44,7 @@ def getB64(content=""):
     return content
 
 def getSha(filename):
+    filename = str(str(filename).split("?")[0]) # This is because github computes the SHA of latest commit, not from the current branch
     res = requests.get(filename).json()
     if("sha" in res):
         sha = res["sha"]
@@ -56,13 +58,16 @@ def update_file(filename="", content="", message="appending issue ids"):
     try:
         sha = getSha(filename)
         content = getB64(content)
+        branch = str(filename.split("ref=")[1])
         method = "put"
         body = {"message": message,
                 "content": content,
-                "sha":sha
+                "sha":sha,
+                "branch":branch
                 }
         print("Filename in target : ", filename)
         print("Sha Generated  : ", sha)
+        print("Target Branch  : ", branch)
         github_output = _make_gihub_request(method=method, url=filename, body=body, verbose=False)
         status, message = github_output[0], github_output[1]
         if(status == ERROR):
