@@ -34,7 +34,7 @@ def _make_gihub_request(method="post", url="", body=None, params={}, headers={},
         pass
     else:
         print("Response from update_issue.py : ", resp_json)
-        output = resp_json
+        output = [SUCCESS, resp_json]
     return output
 
 def getB64(content=""):
@@ -52,7 +52,7 @@ def getSha(filename):
         sha = ""
     return sha
 
-def update_file(filename="", content="", message="appending issue ids"):
+def update_file(filename="", content="", message="appending issue ids donotexecute"):
     global ERROR
     global SUCCESS
     try:
@@ -74,6 +74,7 @@ def update_file(filename="", content="", message="appending issue ids"):
             return False
         elif(status == SUCCESS):
             print("Issues appended successfully")
+            return True
         # Should handle else?
     except Exception as e:
         print("Error while creating the issue " + str(e))
