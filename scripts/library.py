@@ -121,6 +121,8 @@ def get_file_content_from_pr(pr_url=""):
         headers = {'Accept': 'application/vnd.github.v3+json'}
         pr_files = requests.get(pr_file_url, headers=headers)
         files = pr_files.json()
+        print("pr in get_file_content_from_pr : ", pr_url)
+        file_content = ""
         for file in files:
             filename = file["filename"]
             validFile = filename.startswith("message/") and filename.endswith(".yml")
@@ -143,7 +145,9 @@ def parse_yml_file(fileContent=None):
     if(fileContent ==  None):
         return False
     filedata = yaml.safe_load(fileContent)
-    print("loaded yml from the string")
+    print("received file content : ", fileContent)
+    print("loaded yml from the string", filedata)
+
     title = ""
     description = ""
     comments = ""
@@ -204,7 +208,7 @@ def main():
         sys.exit()
     file_content = temp[0]
     yml_file = temp[1]
-    #print("File Content : ", file_content)
+    print("File Content : ", file_content)
     print("Calling the parse_yml_file function")
     outputs = parse_yml_file(fileContent=file_content) #Format List([repo-url, issue-list])
     final_file_content = file_content
