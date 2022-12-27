@@ -1,4 +1,6 @@
 title: Sample Test Title
 description: Sample Description
-comments: Sample Comment2
+comments: Sample Comment3
 recepient_type: testtemplates
+issue_id_list:
+ - fbm3307/testtemplates : https://github.com/fbm3307/testtemplates/issues/18
