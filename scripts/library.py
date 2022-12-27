@@ -122,6 +122,7 @@ def get_file_content_from_pr(pr_url=""):
         pr_files = requests.get(pr_file_url, headers=headers)
         files = pr_files.json()
         print("pr in get_file_content_from_pr : ", pr_url)
+        print("Files : ", files)
         file_content = ""
         for file in files:
             filename = file["filename"]
