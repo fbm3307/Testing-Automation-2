@@ -280,12 +280,14 @@ def main():
     update_message_file(pr_url=pr_url, filename=file_url, filecontent=file_content)
     print("Updated sample-msg.yml file")
 
-    '''
+    
     # 2. Update state-msg.yml file
+    final_file_content = "msg-id: " + str(gMessageId)
     print("Starting to update state-msg.yml file")
     outputs = parse_yml_file(fileContent=file_content) #Format List([repo-url, issue-list])
     base_url = str(pr_url.split("/pulls")[0])
     state_msg_url = base_url + "/state" + "/state-msg.yml?ref=main"
+    print("state_msg_url : " + str(state_msg_url))
     for output in outputs:
         repo_url, issue_url, target = output[0],output[1], output[2]
         final_file_content += f""" {target} - {repo_url} : {issue_url}\n"""
@@ -294,7 +296,7 @@ def main():
     final_file_content_yml = yaml.safe_load(final_file_content)
     update_message_file(filename=state_msg_url, filecontent=final_file_content_yml)
     print("Finished updating state-msg.yml file")
-    '''
+    
     
 
 # File execution strats from here
