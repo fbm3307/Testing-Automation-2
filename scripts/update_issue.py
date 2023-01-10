@@ -14,9 +14,12 @@ def _make_gihub_request(method="post", url="", body=None, params={}, headers={},
     #GITHUB_BASE_URL = "https://api.github.com"
     headers.update({"Authorization": f'Bearer {os.environ["GITHUB_TOKEN"]}',
                     "Accept": "application/vnd.github.v3+json"})    
-    request_method = requests.put
+    if(method == "post"):
+        req_method = requests.post
+    elif(method == "put"):
+        req_method = requests.put
     print("URL in make_github_request : ",url)
-    response = request_method(url, params=params, headers=headers, json=body)
+    response = req_method(url, params=params, headers=headers, json=body)
     try:
         response.raise_for_status()
     except Exception as e:
@@ -80,4 +83,24 @@ def update_file(filename="", content="", message="appending issue ids [skip acti
         print("Error while creating the issue " + str(e))
         return False
 
-
+def add_comment_to_issue(issue_url="", comment=""):
+    global ERROR
+    global SUCCESS
+    try:
+        method = "post"
+        body = {
+            "body":comment
+                }
+        github_output = _make_gihub_request(method=method, url=issue_url, body=body, verbose=False)
+        status, message = github_output[0], github_output[1]
+        if(status == ERROR):
+            print("Could not add the comment")
+            return False
+        elif(status == SUCCESS):
+            print("Comment added successfully.")
+            return True
+        # Should handle else?
+    except Exception as e:
+        print("Error while adding the comment : " + str(e))
+        return False
+    pass

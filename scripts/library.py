@@ -4,12 +4,14 @@ from re import template
 import re
 import sys
 from typing import final
+from uuid import uuid4
 from wsgiref import headers
 import yaml
 import requests
 import argparse
 from create_issue import *
 from update_issue import *
+import uuid
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--pr_url", help="Name of the yaml file which triggered this action")
@@ -20,6 +22,7 @@ pr_url = args.pr_url
 source_branch = args.branch
 print("Received Data: ", pr_url)
 gFilename = "" # This will be used whie updating the issue.
+gMessageId = "" # This variable will store the message id (either newly generated or previously generated)
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -98,21 +101,8 @@ def target_repos(user_input="", issueTitle="", issueDescription=""):
     else:
         print("Invalid input")
         exit()
-
-    for repoName in targetDict.keys():
-        repoList = targetDict[repoName]
-        print("Initiating creation of issues in Repos : ", repoList)
-        for repo in repoList:
-            result = create_an_issue(title=issueTitle,description=issueDescription, repo=str(repo))
-            if(result == False):
-                print("Error while creating the issue in :", repo)
-            else:
-                repo_url = repoList[0]
-                issue_url = result[1]
-                output.append([repo_url, issue_url])
-                print("Issue created successfully :", result[1])
+    return targetDict
     
-    return output
 
 def get_file_content_from_pr(pr_url=""):
     try:
@@ -140,6 +130,23 @@ def get_file_content_from_pr(pr_url=""):
         print("error : " + str(e))
         return False
 
+def create_issues_target(target="",issueTitle="", issueDescription=""):
+    repos = target_repos(user_input=target)
+    output=[]
+    for repoName in repos.keys():
+        repoList = repos[repoName]
+        print("Initiating creation of issues in Repos : ", repoList)
+        for repo in repoList:
+            result = create_an_issue(title=issueTitle,description=issueDescription, repo=str(repo))
+            if(result == False):
+                print("Error while creating the issue in :", repo)
+            else:
+                repo_url = repoList[0]
+                issue_url = result[1]
+                output.append([repo_url, issue_url, target])
+                print("Issue created successfully :", result[1])
+    return output
+
 def parse_yml_file(fileContent=None):
     global allowed_inputs
     print("Inside parse_yml_file")
@@ -153,6 +160,8 @@ def parse_yml_file(fileContent=None):
     description = ""
     comments = ""
     recepient_type = ""
+    operation = ""
+    global gMessageId
     if("title" in filedata):
         title = filedata["title"]
     if("description" in filedata):
@@ -162,20 +171,34 @@ def parse_yml_file(fileContent=None):
     if("recepient_type" in filedata):
         recepient_type = filedata["recepient_type"]
     if("issue_id_list" in filedata):
-        issue_id_list = filedata("issue_id_list")
+        issue_id_list = filedata["issue_id_list"]
+    if("msg-id" in filedata):
+        gMessageId = filedata["msg-id"]
+    else:
+        gMessageId = uuid.uuid4() # Newly generated random id
+    if("operation" in filedata):
+        operation = filedata["operation"]
+    else:
+        # Exit if operation variable is not present
+        print("Please pass the operation to be performed: create_issues/add_comments/close_issues")
+        sys.exit()
     print("title:", title,"description:", description, "comments:", comments, "rec_type", recepient_type)
     if(recepient_type in allowed_inputs):
         load_yaml()
+    else:
+        print("Invalid recepient type")
+        sys.exit()
     print("loaded main yml file")
     if(recepient_type == None):
         #Close all issues
         pass
     elif(recepient_type == "all"):
         #Create issues in all repo (templates, image_stream)
-        print("[+] Inside all")
-        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+        #create_issues_target(target="templates", issueTitle=title, issueDescription=description)
+        #create_issues_target(target="image_streams", issueTitle=title, issueDescription=description)
+        #output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
         #output format : List([repo_name, issue_id_url])
-        print("[+] Executed in all")
+        #print("[+] Executed in all")
         return output
     elif(recepient_type == "templates"):
         #Create issues in all the repo present under templates
@@ -201,7 +224,8 @@ def parse_yml_file(fileContent=None):
     elif(recepient_type == "testtemplates"):
         #Create issues in test templates
         print("[+] Inside testtemplates")
-        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+        #output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+        output = create_issues_target(target="testtemplates", issueTitle=title, issueDescription=description)
         #output format : List([repo_name, issue_id_url])
         print("[+] Executed in testtemplates")
         return output
@@ -215,6 +239,19 @@ def parse_yml_file(fileContent=None):
     else:
         #Throw error
         pass
+
+def update_message_file(pr_url="", filename="", filecontent=""):
+    is_updated = update_file(filename=filename, content=filecontent)
+    try:
+        if(is_updated):
+            print("Updates messaage file successfully!!")
+        else:
+            print("Could not update message file!!")   
+    except Exception as e:
+        print("Error while trying to update message file : " + str(e))
+
+def update_state_file():
+    pass
 
 def main():
     '''
@@ -231,21 +268,34 @@ def main():
     yml_file = temp[1]
     print("File Content : ", file_content)
     print("Calling the parse_yml_file function")
-    outputs = parse_yml_file(fileContent=file_content) #Format List([repo-url, issue-list])
-    final_file_content = file_content
-    final_file_content += "\nissue_id_list:\n"
-    for output in outputs:
-        repo_url, issue_list = output[0],output[1]
-        final_file_content += f""" - {repo_url} : {issue_list}\n"""
-    global gFilename
+    
+    #update_message_file(pr_url=pr_url, filename=file_url, filecontent=file_content)
+    
+    
+    
+    # 1. Update sample-msg.yml file
+    print("Starting to update sample-msg.yml file")
     file_url = str(pr_url.split("/pulls")[0]) + "/contents/" + str(yml_file) + "?ref=" + str(source_branch)
-    print("File URL : ", file_url)
-    #final_file_content_yml = yaml.safe_load(final_file_content)
-    is_updated = update_file(filename=file_url, content=final_file_content)
-    if(is_updated):
-        print("Updated Successfully!!")
-    else:
-        print("Error while updating")
+    file_content += "msg-id: " + str(gMessageId)
+    update_message_file(pr_url=pr_url, filename=file_url, filecontent=file_content)
+    print("Updated sample-msg.yml file")
+
+    '''
+    # 2. Update state-msg.yml file
+    print("Starting to update state-msg.yml file")
+    outputs = parse_yml_file(fileContent=file_content) #Format List([repo-url, issue-list])
+    base_url = str(pr_url.split("/pulls")[0])
+    state_msg_url = base_url + "/state" + "/state-msg.yml?ref=main"
+    for output in outputs:
+        repo_url, issue_url, target = output[0],output[1], output[2]
+        final_file_content += f""" {target} - {repo_url} : {issue_url}\n"""
+    
+    #update_state_file(pr_url=pr_url, issue_url)
+    final_file_content_yml = yaml.safe_load(final_file_content)
+    update_message_file(filename=state_msg_url, filecontent=final_file_content_yml)
+    print("Finished updating state-msg.yml file")
+    '''
+    
 
 # File execution strats from here
 main()

@@ -32,12 +32,10 @@ def _make_gihub_request(method="post", uri="issues", body=None, params={}, heade
         # Error logic
         error = resp_json["error"]
         output = [ERROR, error]
-        pass
     elif("number" in resp_json and "url" in resp_json):
         # Get issue number
         url = resp_json["url"]
         output = [SUCCESS, url]
-        pass
     # Output format
     # Error: ["error", "error message"]
     # Success: ["success", "issue_id_url"]
