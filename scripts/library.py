@@ -175,7 +175,7 @@ def parse_yml_file(fileContent=None):
     if("msg-id" in filedata):
         gMessageId = filedata["msg-id"]
     else:
-        gMessageId = uuid.uuid4() # Newly generated random id
+        gMessageId = str(uuid.uuid4()) # Newly generated random id
     if("operation" in filedata):
         operation = filedata["operation"]
     else:
@@ -224,11 +224,12 @@ def parse_yml_file(fileContent=None):
     elif(recepient_type == "testtemplates"):
         #Create issues in test templates
         print("[+] Inside testtemplates")
-        #output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
-        output = create_issues_target(target="testtemplates", issueTitle=title, issueDescription=description)
-        #output format : List([repo_name, issue_id_url])
-        print("[+] Executed in testtemplates")
-        return output
+        if(operation == "create_issues"):
+            #output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+            output = create_issues_target(target="testtemplates", issueTitle=title, issueDescription=description)
+            #output format : List([repo_name, issue_id_url])
+            print("[+] Executed in testtemplates")
+            return output
     elif(recepient_type == "testall"):
         #Create issues in all test repos - image_stream and templates
         print("[+] Inside testall")
@@ -276,7 +277,7 @@ def main():
     # 1. Update sample-msg.yml file
     print("Starting to update sample-msg.yml file")
     file_url = str(pr_url.split("/pulls")[0]) + "/contents/" + str(yml_file) + "?ref=" + str(source_branch)
-    file_content += "msg-id: " + str(gMessageId)
+    file_content += "\nmsg-id: " + str(gMessageId)
     update_message_file(pr_url=pr_url, filename=file_url, filecontent=file_content)
     print("Updated sample-msg.yml file")
 
