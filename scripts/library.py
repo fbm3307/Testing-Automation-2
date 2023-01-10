@@ -224,11 +224,12 @@ def parse_yml_file(fileContent=None):
     elif(recepient_type == "testtemplates"):
         #Create issues in test templates
         print("[+] Inside testtemplates")
-        #output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
-        output = create_issues_target(target="testtemplates", issueTitle=title, issueDescription=description)
-        #output format : List([repo_name, issue_id_url])
-        print("[+] Executed in testtemplates")
-        return output
+        if(operation == "create_issues"):
+            #output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
+            output = create_issues_target(target="testtemplates", issueTitle=title, issueDescription=description)
+            #output format : List([repo_name, issue_id_url])
+            print("[+] Executed in testtemplates")
+            return output
     elif(recepient_type == "testall"):
         #Create issues in all test repos - image_stream and templates
         print("[+] Inside testall")
