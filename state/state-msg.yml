@@ -1,6 +1,6 @@
-{"name":"state-msg.yml","path":"state/state-msg.yml","sha":"e69de29bb2d1d6434b8b29ae775ad8c2e48c5391","size":0,"url":"https://api.github.com/repos/fbm3307/Testing-Automation-2/contents/state/state-msg.yml?ref=main","html_url":"https://github.com/fbm3307/Testing-Automation-2/blob/main/state/state-msg.yml","git_url":"https://api.github.com/repos/fbm3307/Testing-Automation-2/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391","download_url":"https://raw.githubusercontent.com/fbm3307/Testing-Automation-2/main/state/state-msg.yml","type":"file","content":"","encoding":"base64","_links":{"self":"https://api.github.com/repos/fbm3307/Testing-Automation-2/contents/state/state-msg.yml?ref=main","git":"https://api.github.com/repos/fbm3307/Testing-Automation-2/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391","html":"https://github.com/fbm3307/Testing-Automation-2/blob/main/state/state-msg.yml"}}msg-id: 1673420425
+msg-id: 1673420681
     -testtemplates
-        -https://github.com/fbm3307/testtemplates/issues/23
+        -https://github.com/fbm3307/testtemplates/issues/24
     -testimagestreams
-        -https://github.com/fbm3307/test-learn/issues/16
-        -https://github.com/fbm3307/testimagestreams1/issues/11
+        -https://github.com/fbm3307/test-learn/issues/17
+        -https://github.com/fbm3307/testimagestreams1/issues/12
