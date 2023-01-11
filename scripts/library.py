@@ -351,11 +351,20 @@ def main():
         # Once you are here, sample-msg.yml file should be in correct format.
         # Now, update state-msg.yml file with msg-id and issue-url.
         base_url = str(pr_url.split("/pulls")[0])
-        state_msg_url = base_url + "/state" + "/state-msg.yml?ref=main"
+        state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref=main"
         print("URL generated for state file  : " + str(state_msg_url))
-
-
-        pass
+        headers = {'Accept': 'application/vnd.github.v3+json'}
+        state_file_content = requests.get(state_msg_url, headers=headers).text
+        state_file_content += "msg-id: " + str(msg_id)
+        for key in issue_dict:
+            state_file_content += "\n" + "    -" + str(key)
+            issues_list = issue_dict[key]
+            for issue in issues_list:
+                state_file_content += "\n" + "    " + "    -" + str(issue)
+        if(update_file(filename=state_msg_url, content=state_file_content)):
+            print("Updated state-msg.yml file")
+        else:
+            print("Unable to updaet state-msg.yml file")
     elif(operation == "close_issues"):
         pass
     elif(operation == "comment"):
