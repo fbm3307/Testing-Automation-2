@@ -109,13 +109,13 @@ def target_repos(user_input="", issueTitle="", issueDescription=""):
     
 
 def get_yaml_from_pr(pr_url=""):
+    sample_msg_file_content = ""
+    filename == ""
     try:
         pr_file_url = pr_url + "/files"
         headers = {'Accept': 'application/vnd.github.v3+json'}
         pr_files = requests.get(pr_file_url, headers=headers)
         files = pr_files.json()
-        sample_msg_file_content = ""
-        filename == ""
         for file in files:
             filename = file["filename"]
             validFile = filename.startswith("message/") and filename.endswith(".yml")
@@ -260,6 +260,8 @@ def main():
     # print("Loaded OpenShift yaml file")
     [sample_msg_file_content, filename] = get_yaml_from_pr(pr_url=pr_url)
     if(sample_msg_file_content=="" or filename == ""):
+        print("sample_msg_file_content : ", sample_msg_file_content)
+        print("filename : ", filename)
         print("Unable to extract the content from PR.")
         print("Exiting now")
         sys.exit()
