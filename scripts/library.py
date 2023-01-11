@@ -257,7 +257,7 @@ def main():
     # Uncomment below once in Production
     # load_openshift_yaml()
     # print("Loaded OpenShift yaml file")
-    sample_msg_file_content, filename = get_yaml_from_pr(pr_url=pr_url)
+    [sample_msg_file_content, filename] = get_yaml_from_pr(pr_url=pr_url)
     if(sample_msg_file_content=="" or filename == ""):
         print("Unable to extract the content from PR.")
         print("Exiting now")
