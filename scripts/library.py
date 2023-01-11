@@ -14,7 +14,7 @@ from update_issue import *
 import uuid
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--pr_url", help="Name of the yaml file which triggered this action")
+parser.add_argument("--pr_url", help="Name of the yaml file which triggered this action ")
 parser.add_argument("--branch", help="Source branch from where PR is generated")
 args = parser.parse_args()
 
