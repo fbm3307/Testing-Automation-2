@@ -110,7 +110,7 @@ def target_repos(user_input="", issueTitle="", issueDescription=""):
 
 def get_yaml_from_pr(pr_url=""):
     sample_msg_file_content = ""
-    filename == ""
+    filename = ""
     try:
         pr_file_url = pr_url + "/files"
         headers = {'Accept': 'application/vnd.github.v3+json'}
