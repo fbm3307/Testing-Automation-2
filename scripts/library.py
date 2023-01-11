@@ -124,7 +124,8 @@ def get_yaml_from_pr(pr_url=""):
             raw_url = file['raw_url']
             sample_msg_file_content = requests.get(raw_url, headers=headers).text
             #print("File Content : ", sample_msg_file_content)
-            return [sample_msg_file_content,filename]
+            break
+        return [sample_msg_file_content,filename]
     except Exception as e:
         print("error : " + str(e))
         return ["",""]
