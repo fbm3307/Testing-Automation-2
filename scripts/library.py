@@ -354,8 +354,8 @@ def main():
         state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref=main"
         print("URL generated for state file  : " + str(state_msg_url))
         headers = {'Accept': 'application/vnd.github.v3+json'}
-        state_file_content = requests.get(state_msg_url, headers=headers).text
-        state_file_content += "msg-id: " + str(msg_id)
+        #state_file_content = requests.get(state_msg_url, headers=headers).text
+        state_file_content = "msg-id: " + str(msg_id)
         for key in issue_dict:
             state_file_content += "\n" + "    -" + str(key)
             issues_list = issue_dict[key]
