@@ -25,6 +25,8 @@ print("Received Data: ", pr_url)
 gFilename = "" # This will be used whie updating the issue.
 gMessageId = "" # This variable will store the message id (either newly generated or previously generated)
 MAX_RANDOM = 1000000
+VALID_OPERATIONS = ["create_issues", "comment", "close_issues"]
+VALID_RECEPIENT_TYPE = ["testtemplates", "testimagestreams", "testall"]
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -40,7 +42,7 @@ testallDict = {"testimage":["fbm3307/test-learn"], "testimagest":["fbm3307/testi
 allowed_inputs = ["image_stream", "templates", "all"]
 
 
-def load_yaml():
+def load_openshift_yaml():
     global imageStreamDict
     global templateDict
     global combinedDict
@@ -106,31 +108,26 @@ def target_repos(user_input="", issueTitle="", issueDescription=""):
     return targetDict
     
 
-def get_file_content_from_pr(pr_url=""):
+def get_yaml_from_pr(pr_url=""):
     try:
-        global gFileName
         pr_file_url = pr_url + "/files"
         headers = {'Accept': 'application/vnd.github.v3+json'}
         pr_files = requests.get(pr_file_url, headers=headers)
         files = pr_files.json()
-        print("pr in get_file_content_from_pr : ", pr_url)
-        print("Files : ", files)
-        file_content = ""
+        sample_msg_file_content = ""
+        filename == ""
         for file in files:
             filename = file["filename"]
             validFile = filename.startswith("message/") and filename.endswith(".yml")
             if(not validFile):
                 continue
             raw_url = file['raw_url']
-            gFilename = filename
-            print("Global Variable Set: ", gFilename)
-            file_content = requests.get(raw_url, headers=headers).text
-            print("File Content : ", file_content)
-            break
-        return [file_content,filename]
+            sample_msg_file_content = requests.get(raw_url, headers=headers).text
+            #print("File Content : ", sample_msg_file_content)
+            return [sample_msg_file_content,filename]
     except Exception as e:
         print("error : " + str(e))
-        return False
+        return ["",""]
 
 def create_issues_target(target="",issueTitle="", issueDescription=""):
     repos = target_repos(user_input=target)
@@ -143,9 +140,8 @@ def create_issues_target(target="",issueTitle="", issueDescription=""):
             if(result == False):
                 print("Error while creating the issue in :", repo)
             else:
-                repo_url = repoList[0]
                 issue_url = result[1]
-                output.append([repo_url, issue_url, target])
+                output.append(issue_url)
                 print("Issue created successfully :", result[1])
     return output
 
@@ -185,12 +181,7 @@ def parse_yml_file(fileContent=None):
         print("Please pass the operation to be performed: create_issues/add_comments/close_issues")
         sys.exit()
     print("title:", title,"description:", description, "comments:", comments, "rec_type", recepient_type)
-    if(recepient_type in allowed_inputs):
-        load_yaml()
-    else:
-        print("Invalid recepient type")
-        sys.exit()
-    print("loaded main yml file")
+    
     if(recepient_type == None):
         #Close all issues
         pass
@@ -259,23 +250,122 @@ def update_state_file():
 def main():
     '''
     Execution Steps:
-    1. Load the yaml file to fetch all the repo - load_yml()
+    1. Load the yaml file to fetch all the repo - load_openshift_yml()
     2. Parse PR body. Check with necessary conditions.
     3. Once parsed, call the appropriate functions and execute the steps.
     '''
-    temp = get_file_content_from_pr(pr_url=pr_url)
-    if(temp == False):
-        print("Error while fetching content from the PR")
+    # Uncomment below once in Production
+    # load_openshift_yaml()
+    # print("Loaded OpenShift yaml file")
+    sample_msg_file_content, filename = get_yaml_from_pr(pr_url=pr_url)
+    if(sample_msg_file_content=="" or filename == ""):
+        print("Unable to extract the content from PR.")
+        print("Exiting now")
         sys.exit()
-    file_content = temp[0]
-    yml_file = temp[1]
-    print("File Content : ", file_content)
-    print("Calling the parse_yml_file function")
     
+    # Parse the yaml content which we got from PR
+    try:
+        sample_msg_yml_format = yaml.safe_load(sample_msg_file_content)
+    except Exception as e:
+        print("Not valid yaml content")
+        print("Exiting now")
+        sys.exit()
+
+    if("operation" not in sample_msg_yml_format):
+        print("Operation not specified. Exiting Now")
+        sys.exit()
+    else:
+        operation = sample_msg_yml_format["operation"]
+        if(operation not in VALID_OPERATIONS):
+            print("Invalid operation specified : " + str(operation) + ". Exiting Now!")
+            sys.exit()
+    if("recepient_type" not in sample_msg_yml_format):
+        print("Recepient Type not found")
+    else:
+        recepient_type = sample_msg_yml_format["recepient_type"]
+        if(recepient_type not in VALID_RECEPIENT_TYPE):
+            print("Invalid recepient type : " + str(recepient_type) + ". Exiting Now!")
+            sys.exit()
+    
+    # Once you reach here, you will have valid operation to perform on valid recepient_type
+    if(operation == "create_issues"):
+        if("title" not in sample_msg_yml_format):
+            print("Could not find the title. Exiting Now!")
+            sys.exit()
+        elif("description" not in sample_msg_yml_format):
+            print("Could not find the description. Exiting Now!")
+            sys.exit()
+        
+        title = sample_msg_yml_format["title"]
+        description = sample_msg_yml_format["description"]
+        if(title == ""):
+            print("Found empty title. Exiting Now!")
+            sys.exit()
+        if(description == ""):
+            print("Found empty description. Exiting Now!")
+            sys.exit()
+        # Now, call create_issue(recepient_type="", title="", description=""). This will return [repo-url, issue-url]
+        issue_dict = {}
+        if(recepient_type == "testall"):
+            issue_url_list = create_issues_target(recepient_type="testtemplates", title=title, description=description)
+            issue_dict["testtemplates"] = issue_url_list
+            issue_url_list = []
+            issue_url_list = create_issues_target(recepient_type="testimagestreams", title=title, description=description)
+            issue_dict["testimagestreams"] = issue_url_list
+            issue_url_list = []
+        elif(recepient_type == "testtemplates"):
+            issue_url_list = create_issues_target(recepient_type="testtemplates", title=title, description=description)
+            issue_dict["testtemplates"] = issue_url_list
+            issue_url_list = []
+        elif(recepient_type == "testimagestreams"):
+            issue_url_list = create_issues_target(recepient_type="testimagestreams", title=title, description=description)
+            issue_dict["testimagestreams"] = issue_url_list
+            issue_url_list = []
+        else:
+            print("Could not find recepient_type. Exiting Now!")
+            sys.exit()
+        if(issue_dict == {}):
+            print("Did not find any issues to update. Exiting Now!")
+            sys.exit()
+        
+        # Now, we have to update sample-msg.yml with msg-id, and update state-msg.yml file with msg-id:issue-url
+        if("msg-id" in sample_msg_yml_format):
+            msg_id = sample_msg_yml_format["msg-id"]
+            # No need to updatem sample-msg.yml file now
+        else:
+            msg_id = str(int(time.time()))
+            # Now, append sample-msg.yml file
+            sample_msg_file_content +="\nmsg-id: " + str(msg_id)
+            print("Updating sample-msg.yml file")
+            fileurl = str(pr_url.split("/pulls")[0]) + "/contents/" + str(filename) + "?ref=" + str(source_branch)
+            print("File being udpated : " + str(fileurl))
+            if(update_file(filename=fileurl, content=sample_msg_file_content)):
+                print("Updated sample-msg.yml file successfully!")
+            else:
+                print("Could not update sample-msg.yml file. Exiting Now!")
+                sys.exit()
+        
+        # Once you are here, sample-msg.yml file should be in correct format.
+        # Now, update state-msg.yml file with msg-id and issue-url.
+        base_url = str(pr_url.split("/pulls")[0])
+        state_msg_url = base_url + "/state" + "/state-msg.yml?ref=main"
+        print("URL generated for state file  : " + str(state_msg_url))
+
+
+        pass
+    elif(operation == "close_issues"):
+        pass
+    elif(operation == "comment"):
+        pass
+    else:
+        print("Could not find operation " + str(operation)+ ". Exiting Now!")
+        sys.exit()
+
+
     #update_message_file(pr_url=pr_url, filename=file_url, filecontent=file_content)
     
     
-    
+    '''
     # 1. Update sample-msg.yml file
     print("Starting to update sample-msg.yml file")
     file_url = str(pr_url.split("/pulls")[0]) + "/contents/" + str(yml_file) + "?ref=" + str(source_branch)
@@ -299,6 +389,7 @@ def main():
     final_file_content_yml = yaml.safe_load(final_file_content)
     update_file(filename=state_msg_url, filecontent=final_file_content_yml)
     print("Finished updating state-msg.yml file")
+    '''
     
     
 

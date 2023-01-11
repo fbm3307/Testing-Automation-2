@@ -68,19 +68,19 @@ def update_file(filename="", content="", message="appending issue ids [skip acti
                 "sha":sha,
                 "branch":branch
                 }
-        print("Filename in target : ", filename)
-        print("Sha Generated  : ", sha)
-        print("Target Branch  : ", branch)
+        #print("Filename in target : ", filename)
+        #print("Sha Generated  : ", sha)
+        #print("Target Branch  : ", branch)
         github_output = _make_gihub_request(method=method, url=filename, body=body, verbose=False)
         status, message = github_output[0], github_output[1]
         if(status == ERROR):
             return False
         elif(status == SUCCESS):
-            print("Issues appended successfully")
             return True
         # Should handle else?
     except Exception as e:
-        print("Error while creating the issue " + str(e))
+        print("Error while updating file : " + str(filename))
+        print("Error : " + str(e))
         return False
 
 def add_comment_to_issue(issue_url="", comment=""):
