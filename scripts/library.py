@@ -310,18 +310,18 @@ def main():
         # Now, call create_issue(recepient_type="", title="", description=""). This will return [repo-url, issue-url]
         issue_dict = {}
         if(recepient_type == "testall"):
-            issue_url_list = create_issues_target(recepient_type="testtemplates", title=title, description=description)
+            issue_url_list = create_issues_target(target="testtemplates", title=title, description=description)
             issue_dict["testtemplates"] = issue_url_list
             issue_url_list = []
-            issue_url_list = create_issues_target(recepient_type="testimagestreams", title=title, description=description)
+            issue_url_list = create_issues_target(target="testimagestreams", title=title, description=description)
             issue_dict["testimagestreams"] = issue_url_list
             issue_url_list = []
         elif(recepient_type == "testtemplates"):
-            issue_url_list = create_issues_target(recepient_type="testtemplates", title=title, description=description)
+            issue_url_list = create_issues_target(target="testtemplates", title=title, description=description)
             issue_dict["testtemplates"] = issue_url_list
             issue_url_list = []
         elif(recepient_type == "testimagestreams"):
-            issue_url_list = create_issues_target(recepient_type="testimagestreams", title=title, description=description)
+            issue_url_list = create_issues_target(target="testimagestreams", title=title, description=description)
             issue_dict["testimagestreams"] = issue_url_list
             issue_url_list = []
         else:
