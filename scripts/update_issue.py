@@ -112,7 +112,7 @@ def merge_pull_request(pr_url="", commit_title="", commit_message=""):
         "commit_message":commit_message
     }
     method = "put"
-    [isSuccess, response] = _make_gihub_request(method=method, uri=pr_url, body=body)
+    [isSuccess, response] = _make_gihub_request(method=method, url=pr_url, body=body)
     if(isSuccess):
         success = response["merged"]
         if(success):
