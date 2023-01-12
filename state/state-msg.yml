@@ -1,0 +1,6 @@
+msg-id: 1673420681
+    -testtemplates
+        -https://github.com/fbm3307/testtemplates/issues/24
+    -testimagestreams
+        -https://github.com/fbm3307/test-learn/issues/17
+        -https://github.com/fbm3307/testimagestreams1/issues/12
