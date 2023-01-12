@@ -105,7 +105,7 @@ def add_comment_to_issue(issue_url="", comment=""):
         return False
     pass
 
-def merge_pull_request(pr_url=pr_url, commit_title="", commit_message=""):
+def merge_pull_request(pr_url="", commit_title="", commit_message=""):
     pr_url += "/merge"
     body = {
         "commit_title":commit_title,
