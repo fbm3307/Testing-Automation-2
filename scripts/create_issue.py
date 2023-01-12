@@ -16,7 +16,10 @@ def _make_gihub_request(method="post", uri="issues", body=None, params={}, heade
     print(headers)
     url = f'{GITHUB_BASE_URL}/repos/{repo}/{uri}'
     print(f"API url: https://github.com/{repo}/{uri}")
-    request_method = requests.post
+    if(method == "post"):
+        request_method = requests.post
+    elif(method == "put"):
+        request_method = requests.put
     response = request_method(url, params=params, headers=headers, json=body)
     try:
         response.raise_for_status()
@@ -62,3 +65,4 @@ def create_an_issue(title, description="Description", repo=""):
     except Exception as e:
         print("Error while creating the issue " + str(e))
         return False
+

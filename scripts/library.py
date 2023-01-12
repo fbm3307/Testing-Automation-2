@@ -27,6 +27,8 @@ gMessageId = "" # This variable will store the message id (either newly generate
 MAX_RANDOM = 1000000
 VALID_OPERATIONS = ["create_issues", "comment", "close_issues"]
 VALID_RECEPIENT_TYPE = ["testtemplates", "testimagestreams", "testall"]
+PR_MERGE_COMMIT_TITLE = "Merging through workflow [skip action]"
+PR_MERGE_COMMIT_MESSAGE = "Merging through workflow [skip action]"
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -248,6 +250,8 @@ def update_message_file(pr_url="", filename="", filecontent=""):
 def update_state_file():
     pass
 
+
+
 def main():
     '''
     Execution Steps:
@@ -351,11 +355,11 @@ def main():
         # Once you are here, sample-msg.yml file should be in correct format.
         # Now, update state-msg.yml file with msg-id and issue-url.
         base_url = str(pr_url.split("/pulls")[0])
-        state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref=main"
+        state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
         print("URL generated for state file  : " + str(state_msg_url))
         headers = {'Accept': 'application/vnd.github.v3+json'}
-        state_file_content = requests.get(state_msg_url, headers=headers).text
-        state_file_content += "msg-id: " + str(msg_id)
+        #state_file_content = requests.get(state_msg_url, headers=headers).text
+        state_file_content = "msg-id: " + str(msg_id)
         for key in issue_dict:
             state_file_content += "\n" + "    -" + str(key)
             issues_list = issue_dict[key]
@@ -365,6 +369,12 @@ def main():
             print("Updated state-msg.yml file")
         else:
             print("Unable to updaet state-msg.yml file")
+        print("[+] Initiating the merge of pull request")
+        isMerged = merge_pull_request(pr_url=pr_url, commit_title=PR_MERGE_COMMIT_TITLE, commit_message=PR_MERGE_COMMIT_MESSAGE)
+        if(isMerged):
+            print("[+] Merge successfull!")
+        else:
+            print("[-] Could not merge the request.")
     elif(operation == "close_issues"):
         pass
     elif(operation == "comment"):
