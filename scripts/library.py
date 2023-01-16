@@ -287,11 +287,11 @@ def main():
         sys.exit()
     #  Code block for state message file
     base_url = str(pr_url.split("/pulls")[0])
-    state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
-    state_file_content = read_yml_file(file_url=state_msg_url)
+    state_msg_url_main = base_url + "/contents/state" + "/state-msg.yml?ref="+"main"
+    state_file_content = read_yml_file(file_url=state_msg_url_main)
     if(state_file_content==""):
         print("state_file_content : ", sample_msg_file_content)
-        print("Unable to extract the content from PR.")
+        print("Unable to extract the content from main branch.")
         print("Exiting now")
         sys.exit()
     msg_id_dict = yaml.safe_load(state_file_content)
@@ -383,7 +383,7 @@ def main():
         
         # Once you are here, sample-msg.yml file should be in correct format.
         # Now, update state-msg.yml file with msg-id and issue-url.
-        
+        state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
         print("URL generated for state file  : " + str(state_msg_url))
         headers = {'Accept': 'application/vnd.github.v3+json'}
         #state_file_content = requests.get(state_msg_url, headers=headers).text
