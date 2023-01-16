@@ -403,10 +403,10 @@ def main():
         for key in msg_id_dict.keys():
             state_file_content += "msg-id: " + str(msg_id)
             for key in issue_dict:
-                state_file_content += "\n" + "    " + str(key)
+                state_file_content += "\n" + "    " + str(key) + ":"
                 issues_list = issue_dict[key]
                 for issue in issues_list:
-                    state_file_content += "\n" + "    " + "    -" + str(issue)
+                    state_file_content += "\n" + "    " + "    " + str(issue)
             state_file_content += "\n"
         print("state_msg_file content generated", state_file_content)
         if(update_file(filename=state_msg_url, content=state_file_content)):
