@@ -296,6 +296,8 @@ def main():
         print("Exiting now")
         sys.exit()
     msg_id_dict = yaml.safe_load(state_file_content)
+    if(msg_id_dict == None):
+        msg_id_dict == dict()
 
 
 
