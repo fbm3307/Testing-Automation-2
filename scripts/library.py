@@ -405,7 +405,7 @@ def main():
         for key in msg_id_dict.keys():
             state_file_content += str(msg_id) + ":"
             for key in issue_dict:
-                state_file_content += "\n" + " " + str(key)
+                state_file_content += "\n" + " " + str(key) + ":"
                 issues_list = issue_dict[key]
                 for issue in issues_list:
                     state_file_content += "\n" + " " + " " + "- " + str(issue)
