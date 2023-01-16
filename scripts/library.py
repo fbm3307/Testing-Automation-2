@@ -13,6 +13,7 @@ from create_issue import *
 from update_issue import *
 import random
 import time
+import base64
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--pr_url", help="Name of the yaml file which triggered this action")
@@ -109,6 +110,20 @@ def target_repos(user_input="", issueTitle="", issueDescription=""):
         exit()
     return targetDict
     
+
+def read_yml_file(file_url=""):
+    sample_msg_file_content = ""
+    filename = ""
+    try:
+        headers = {'Accept': 'application/vnd.github.v3+json'}
+        response = requests.get(file_url, headers=headers)
+        response = response.json()
+        file_content = response["content"]
+        file_content = base64.b64decode(file_content)
+        return file_content
+    except Exception as e:
+        print("error : " + str(e))
+        return ""
 
 def get_yaml_from_pr(pr_url=""):
     sample_msg_file_content = ""
@@ -262,6 +277,7 @@ def main():
     # Uncomment below once in Production
     # load_openshift_yaml()
     # print("Loaded OpenShift yaml file")
+    # Code block for sample message file
     [sample_msg_file_content, filename] = get_yaml_from_pr(pr_url=pr_url)
     if(sample_msg_file_content=="" or filename == ""):
         print("sample_msg_file_content : ", sample_msg_file_content)
@@ -269,6 +285,20 @@ def main():
         print("Unable to extract the content from PR.")
         print("Exiting now")
         sys.exit()
+    #  Code block for state message file
+    base_url = str(pr_url.split("/pulls")[0])
+    state_msg_url_main = base_url + "/contents/state" + "/state-msg.yml?ref="+"main"
+    state_file_content = read_yml_file(file_url=state_msg_url_main)
+    if(state_file_content==""):
+        print("state_msg_url_main : ", state_msg_url_main)
+        print("state_file_content : ", sample_msg_file_content)
+        print("Unable to extract the content from main branch.")
+        print("Exiting now")
+        sys.exit()
+    msg_id_dict = yaml.safe_load(state_file_content)
+
+
+
     
     # Parse the yaml content which we got from PR
     try:
@@ -354,17 +384,31 @@ def main():
         
         # Once you are here, sample-msg.yml file should be in correct format.
         # Now, update state-msg.yml file with msg-id and issue-url.
-        base_url = str(pr_url.split("/pulls")[0])
         state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
         print("URL generated for state file  : " + str(state_msg_url))
         headers = {'Accept': 'application/vnd.github.v3+json'}
         #state_file_content = requests.get(state_msg_url, headers=headers).text
-        state_file_content = "msg-id: " + str(msg_id)
+        if(msg_id not in msg_id_dict):
+            msg_id_dict[msg_id] = dict()
+            print("[-] Provided message id not found. Added new message id.")
         for key in issue_dict:
-            state_file_content += "\n" + "    -" + str(key)
-            issues_list = issue_dict[key]
-            for issue in issues_list:
-                state_file_content += "\n" + "    " + "    -" + str(issue)
+            if(key in msg_id_dict[msg_id]):
+                msg_id_dict[msg_id][key].append(issue_dict[key])
+            else:
+                msg_id_dict[msg_id][key] = [issue_dict[key]]
+        print("[+] Issues added to msg_id_dict")
+        print("[+] msg_id_dict : ", msg_id_dict)
+        print("[+] Generating the content for state_msg_file")
+        state_file_content = ""
+        for key in msg_id_dict.keys():
+            state_file_content += "msg-id: " + str(msg_id)
+            for key in issue_dict:
+                state_file_content += "\n" + "    -" + str(key)
+                issues_list = issue_dict[key]
+                for issue in issues_list:
+                    state_file_content += "\n" + "    " + "    -" + str(issue)
+            state_file_content += "\n"
+        print("state_msg_file content generated", state_file_content)
         if(update_file(filename=state_msg_url, content=state_file_content)):
             print("Updated state-msg.yml file")
         else:
