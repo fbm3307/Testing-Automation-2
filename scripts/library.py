@@ -402,12 +402,12 @@ def main():
         print("[+] msg_id_dict : ", msg_id_dict)
         print("[+] Generating the content for state_msg_file")
         state_file_content = ""
-        for key in msg_id_dict.keys():
-            state_file_content += str(msg_id) + ":"
-            for key in issue_dict:
-                state_file_content += "\n" + " " + str(key) + ":"
-                issues_list = issue_dict[key]
-                for issue in issues_list:
+        for msg_key in msg_id_dict.keys():
+            state_file_content += str(msg_key) + ":"
+            for rec_type in msg_id_dict[msg_key].keys():
+                rec_issue_list = msg_id_dict[msg_key][rec_type]
+                state_file_content += "\n" + " " + str(rec_type) + ":"
+                for issue in rec_issue_list:
                     state_file_content += "\n" + " " + " " + "- " + str(issue)
             state_file_content += "\n"
         print("state_msg_file content generated", state_file_content)
