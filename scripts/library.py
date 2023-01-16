@@ -397,7 +397,7 @@ def main():
             if(key in msg_id_dict[msg_id]):
                 msg_id_dict[msg_id][key].append(issue_dict[key])
             else:
-                msg_id_dict[msg_id][key] = [issue_dict[key]]
+                msg_id_dict[msg_id][key] = issue_dict[key]
         print("[+] Issues added to msg_id_dict")
         print("[+] msg_id_dict : ", msg_id_dict)
         print("[+] Generating the content for state_msg_file")
