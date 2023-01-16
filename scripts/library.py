@@ -120,7 +120,7 @@ def read_yml_file(file_url=""):
         response = response.json()
         file_content = response["content"]
         file_content = base64.b64decode(file_content)
-        return sample_msg_file_content
+        return file_content
     except Exception as e:
         print("error : " + str(e))
         return ""
@@ -290,6 +290,7 @@ def main():
     state_msg_url_main = base_url + "/contents/state" + "/state-msg.yml?ref="+"main"
     state_file_content = read_yml_file(file_url=state_msg_url_main)
     if(state_file_content==""):
+        print("state_msg_url_main : ", state_msg_url_main)
         print("state_file_content : ", sample_msg_file_content)
         print("Unable to extract the content from main branch.")
         print("Exiting now")
