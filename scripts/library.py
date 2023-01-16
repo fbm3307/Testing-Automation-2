@@ -416,6 +416,8 @@ def main():
         else:
             print("Unable to updaet state-msg.yml file")
         print("[+] Initiating the merge of pull request")
+        print("[+] Sleeping for 5 sec to ensure commits are updated.")
+        time.sleep(5)
         isMerged = merge_pull_request(pr_url=pr_url, commit_title=PR_MERGE_COMMIT_TITLE, commit_message=PR_MERGE_COMMIT_MESSAGE)
         if(isMerged):
             print("[+] Merge successfull!")
