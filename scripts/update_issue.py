@@ -18,6 +18,8 @@ def _make_gihub_request(method="post", url="", body=None, params={}, headers={},
         req_method = requests.post
     elif(method == "put"):
         req_method = requests.put
+    elif(method == "patch"):
+        req_method = requests.patch
     print("URL in make_github_request : ",url)
     response = req_method(url, params=params, headers=headers, json=body)
     try:
@@ -36,7 +38,6 @@ def _make_gihub_request(method="post", url="", body=None, params={}, headers={},
         output = [ERROR, error]
         pass
     else:
-        print("Response from update_issue.py : ", resp_json)
         output = [SUCCESS, resp_json]
     return output
 
@@ -81,7 +82,32 @@ def addComment(issue_url="", comment=""):
         print(json.dumps(resp, indent=4))
         return False
     else:
-        return True
+        return False
+
+def closeIssue(issue_url=""):
+    issue_url = str(issue_url).strip()
+    if(issue_url == ""):
+        print("[-] Found empty issue_url.")
+        return False
+    else:
+        body = {
+            "state":"closed"
+        }
+        [status, resp] = _make_gihub_request(method="patch", url=issue_url, body=body)
+        if(status == SUCCESS):
+            if("id" not in resp):
+                print("[-] Could not close the issue : " + str(issue_url))
+                return False
+            else:
+                print("[+] Issue closed successfully : " + str(issue_url))
+                return True
+        elif(status == ERROR):
+            print("[-] Error while closing the issue.")
+            print("[-] Error:")
+            print(json.dumps(resp, indent=4))
+            return False
+        else:
+            return False
 
 def update_file(filename="", content="", message="appending issue ids [skip actions]"):
     global ERROR
