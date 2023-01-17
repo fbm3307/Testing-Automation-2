@@ -426,6 +426,37 @@ def main():
     elif(operation == "close_issues"):
         pass
     elif(operation == "comment"):
+        if("comment" not in sample_msg_yml_format):
+            print("[-] Could not find comment section in sample-msg.yml file. Exiting Now.")
+            sys.exit()
+        else:
+            comment = sample_msg_yml_format["comment"]
+            comment = str(comment).strip()
+            if(comment == ""):
+                print("[-] Found empty comment. Exiting Now.")
+                sys.exit()
+        if("msg_id" not in sample_msg_yml_format):
+            print("[-] No message id found  to udpate comments. Exiting Now.")
+            sys.exit()
+        else:
+            msg_id = sample_msg_yml_format["msg_id"]
+            print("[+] Looking for message id : " + str(msg_id))
+            if(msg_id not in msg_id_dict):
+                print("[-] Could not find the message id in state-msg.yml file. Exiting Now.")
+                sys.exit()
+        # Once you are here, you will have the msg_id and the comment to be updated.
+        target_msg_id_dict = msg_id_dict[msg_id]
+        for rec_type in target_msg_id_dict.keys():
+            rec_type_issue_list = target_msg_id_dict[rec_type]
+            for issue in rec_type_issue_list:
+                repo = str(issue).split("https://github.com/")[1]
+                repo = str(repo)
+                issue_url = "https://api.github.com" + "/repos" + repo + "/comments"
+                isCommentSuccess = addComment(issue_url=issue_url, comment=comment)
+                if(isCommentSuccess):
+                    print("[+] Comment added for : " + str(issue))
+                else:
+                    print("[-] Could not add comment for : " + str(issue))
         pass
     else:
         print("Could not find operation " + str(operation)+ ". Exiting Now!")

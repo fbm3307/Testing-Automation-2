@@ -55,6 +55,34 @@ def getSha(filename):
         sha = ""
     return sha
 
+def addComment(issue_url="", comment=""):
+    issue_url = str(issue_url).strip()
+    comment = str(comment).strip()
+    if(issue_url == ""):
+        print("[-] Found empty issue_url.")
+        return False
+    if(comment == ""):
+        print("[-] Found empty comment.")
+        return False
+    body = {
+        "body":comment
+    }
+    [status, resp] = _make_gihub_request(method="post", url=issue_url, body=body)
+    if(status == SUCCESS):
+        if("id" not in resp):
+            print("[-] Could not add comment to issue : " + str(issue_url))
+            return False
+        else:
+            print("[+] Comment added successfully to issue : " + str(issue_url))
+            return True
+    elif(status == ERROR):
+        print("[-] Error while adding comment to the issue.")
+        print("[-] Error:")
+        print(json.dumps(resp, indent=4))
+        return False
+    else:
+        return True
+
 def update_file(filename="", content="", message="appending issue ids [skip actions]"):
     global ERROR
     global SUCCESS
@@ -82,7 +110,7 @@ def update_file(filename="", content="", message="appending issue ids [skip acti
         print("Error while updating file : " + str(filename))
         print("Error : " + str(e))
         return False
-
+'''
 def add_comment_to_issue(issue_url="", comment=""):
     global ERROR
     global SUCCESS
@@ -104,7 +132,7 @@ def add_comment_to_issue(issue_url="", comment=""):
         print("Error while adding the comment : " + str(e))
         return False
     pass
-
+'''
 def merge_pull_request(pr_url="", commit_title="", commit_message=""):
     pr_url += "/merge"
     body = {

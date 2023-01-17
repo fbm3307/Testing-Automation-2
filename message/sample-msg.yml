@@ -1,5 +1,6 @@
 title: Sample Test Title
 description: Sample Description 24
 recepient_type: testimagestreams
-operation: create_issues
+operation: comment
+comment: Sample Comment
 msg-id: 1673860296
