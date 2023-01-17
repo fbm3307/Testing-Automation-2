@@ -415,14 +415,7 @@ def main():
             print("Updated state-msg.yml file")
         else:
             print("Unable to updaet state-msg.yml file")
-        print("[+] Initiating the merge of pull request")
-        print("[+] Sleeping for 5 sec to ensure commits are updated.")
-        time.sleep(5)
-        isMerged = merge_pull_request(pr_url=pr_url, commit_title=PR_MERGE_COMMIT_TITLE, commit_message=PR_MERGE_COMMIT_MESSAGE)
-        if(isMerged):
-            print("[+] Merge successfull!")
-        else:
-            print("[-] Could not merge the request.")
+        
     elif(operation == "close_issues"):
         pass
     elif(operation == "comment"):
@@ -435,11 +428,11 @@ def main():
             if(comment == ""):
                 print("[-] Found empty comment. Exiting Now.")
                 sys.exit()
-        if("msg_id" not in sample_msg_yml_format):
+        if("msg-id" not in sample_msg_yml_format):
             print("[-] No message id found  to udpate comments. Exiting Now.")
             sys.exit()
         else:
-            msg_id = sample_msg_yml_format["msg_id"]
+            msg_id = sample_msg_yml_format["msg-id"]
             print("[+] Looking for message id : " + str(msg_id))
             if(msg_id not in msg_id_dict):
                 print("[-] Could not find the message id in state-msg.yml file. Exiting Now.")
@@ -462,6 +455,9 @@ def main():
         print("Could not find operation " + str(operation)+ ". Exiting Now!")
         sys.exit()
     # Merget the Pull Request
+    print("[+] Initiating the merge of pull request")
+    print("[+] Sleeping for 5 sec to ensure commits are updated.")
+    time.sleep(5)
     isMerged = merge_pull_request(pr_url=pr_url, commit_title=PR_MERGE_COMMIT_TITLE, commit_message=PR_MERGE_COMMIT_MESSAGE)
     if(isMerged):
         print("[+] Merge successfull!")
