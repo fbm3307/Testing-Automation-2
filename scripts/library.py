@@ -444,13 +444,13 @@ def main():
             for issue in rec_type_issue_list:
                 repo = str(issue).split("https://github.com/")[1]
                 repo = str(repo)
-                issue_url = "https://api.github.com" + "/repos" + repo + "/comments"
+                issue_url = "https://api.github.com" + "/repos/" + repo + "/comments"
                 isCommentSuccess = addComment(issue_url=issue_url, comment=comment)
                 if(isCommentSuccess):
                     print("[+] Comment added for : " + str(issue))
                 else:
                     print("[-] Could not add comment for : " + str(issue))
-        pass
+                    print("[-] Issue URL " + str(issue_url))
     else:
         print("Could not find operation " + str(operation)+ ". Exiting Now!")
         sys.exit()
