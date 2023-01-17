@@ -461,6 +461,12 @@ def main():
     else:
         print("Could not find operation " + str(operation)+ ". Exiting Now!")
         sys.exit()
+    # Merget the Pull Request
+    isMerged = merge_pull_request(pr_url=pr_url, commit_title=PR_MERGE_COMMIT_TITLE, commit_message=PR_MERGE_COMMIT_MESSAGE)
+    if(isMerged):
+        print("[+] Merge successfull!")
+    else:
+        print("[-] Could not merge the request.")
 
 
     #update_message_file(pr_url=pr_url, filename=file_url, filecontent=file_content)
