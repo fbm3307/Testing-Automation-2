@@ -417,7 +417,33 @@ def main():
             print("Unable to updaet state-msg.yml file")
         
     elif(operation == "close_issues"):
-        pass
+        if("msg-id" not in sample_msg_yml_format):
+            print("[-] No message id found to close the issues. Exiting Now.")
+            sys.exit()
+        else:
+            msg_id = sample_msg_yml_format["msg-id"]
+            print("[+] Looking for message id : " + str(msg_id))
+            if(msg_id not in msg_id_dict):
+                print("[-] Could not find the message id in state-msg.yml file. Exiting Now.")
+                sys.exit()
+        # Once you are here, you will have the msg_id and the comment to be updated.
+        target_msg_id_dict = msg_id_dict[msg_id]
+        for rec_type in target_msg_id_dict.keys():
+            if(recepient_type != "all"):
+                if(rec_type != recepient_type):
+                    print("[+] Skipping the non-required recepient type : " + str(rec_type))
+                    continue
+            rec_type_issue_list = target_msg_id_dict[rec_type]
+            for issue in rec_type_issue_list:
+                repo = str(issue).split("https://github.com/")[1]
+                repo = str(repo)
+                issue_url = "https://api.github.com" + "/repos/" + repo
+                isCloseSuccess = closeIssue(issue_url=issue_url)
+                if(isCloseSuccess):
+                    print("[+] Closed Issue : " + str(issue))
+                else:
+                    print("[-] Could not close the issue : " + str(issue))
+                    print("[-] Issue URL " + str(issue_url))
     elif(operation == "comment"):
         if("comment" not in sample_msg_yml_format):
             print("[-] Could not find comment section in sample-msg.yml file. Exiting Now.")
@@ -429,7 +455,7 @@ def main():
                 print("[-] Found empty comment. Exiting Now.")
                 sys.exit()
         if("msg-id" not in sample_msg_yml_format):
-            print("[-] No message id found  to udpate comments. Exiting Now.")
+            print("[-] No message id found to udpate comments. Exiting Now.")
             sys.exit()
         else:
             msg_id = sample_msg_yml_format["msg-id"]
@@ -437,9 +463,14 @@ def main():
             if(msg_id not in msg_id_dict):
                 print("[-] Could not find the message id in state-msg.yml file. Exiting Now.")
                 sys.exit()
+        
         # Once you are here, you will have the msg_id and the comment to be updated.
         target_msg_id_dict = msg_id_dict[msg_id]
         for rec_type in target_msg_id_dict.keys():
+            if(recepient_type != "all"):
+                if(rec_type != recepient_type):
+                    print("[+] Skipping the non-required recepient type : " + str(rec_type))
+                    continue
             rec_type_issue_list = target_msg_id_dict[rec_type]
             for issue in rec_type_issue_list:
                 repo = str(issue).split("https://github.com/")[1]
