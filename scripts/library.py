@@ -313,7 +313,7 @@ def main():
             for type_list in types.keys():
                 state_file_content += "\n" + " " + str(type_list) + ":"
                 for type_ in msg_id_dict[msg_id][type_list]:
-                    state_file_content += "\n" + " " + " " + str(type_)
+                    state_file_content += "\n" + " " + " - " + str(type_)
             state_file_content += "\n"
         print("state_msg_file content generated", state_file_content)
         if(update_file(filename=state_msg_url, content=state_file_content)):
