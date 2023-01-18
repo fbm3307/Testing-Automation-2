@@ -20,7 +20,6 @@ def _make_gihub_request(method="post", url="", body=None, params={}, headers={},
         req_method = requests.put
     elif(method == "patch"):
         req_method = requests.patch
-    print("URL in make_github_request : ",url)
     response = req_method(url, params=params, headers=headers, json=body)
     try:
         response.raise_for_status()
