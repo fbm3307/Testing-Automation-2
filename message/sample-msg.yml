@@ -1,6 +1,6 @@
 title: Testing automation workflow
 description: This is testing of automation workflow.
-recepient_type: testimagestreams
-operation: comment
+recepient_type: testall
+operation: close_issues
 comment: Testing finished. Will be closing this issue now.
 msg-id: 1674018269
