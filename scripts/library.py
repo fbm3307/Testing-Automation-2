@@ -297,9 +297,12 @@ def main():
         for issue_list in issue_dict:
             for issue in issue_list:
                 if(recepient_type in msg_id_dict[msg_id]):
+                    print("Found recepient_type")
                     msg_id_dict[msg_id][recepient_type].append(issue)
                 else:
-                    msg_id_dict[msg_id][recepient_type] = issue
+                    print("Could not find recepient type. Generating now!!")
+                    print("Issue : ", issue)
+                    msg_id_dict[msg_id][recepient_type] = [issue]
         print("[+] Issues added to msg_id_dict")
         print("[+] msg_id_dict : ", msg_id_dict)
         print("[+] Generating the content for state_msg_file")
