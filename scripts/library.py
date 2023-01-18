@@ -320,34 +320,52 @@ def main():
             print("Updated state-msg.yml file")
         else:
             print("Unable to updated state-msg.yml file")    
-    elif(operation == "close_issues"):
-        if("msg-id" not in sample_msg_yml_format):
-            print("[-] No message id found to close the issues. Exiting Now.")
+    elif("close" in sample_msg_yml_format):
+        msg_id = sample_msg_yml_format["msg-id"]
+
+        close = sample_msg_yml_format["close"]
+        close = str(close).lower()
+        if(close != "true"):
+            print("[-] Invalid value for close operation : " + str(close) + ". Exiting Now!")
             sys.exit()
-        else:
-            msg_id = sample_msg_yml_format["msg-id"]
-            print("[+] Looking for message id : " + str(msg_id))
-            if(msg_id not in msg_id_dict):
-                print("[-] Could not find the message id in state-msg.yml file. Exiting Now.")
-                sys.exit()
+        print("[+] Looking for message id : " + str(msg_id))
+        if(msg_id not in msg_id_dict):
+            print("[-] Could not find the message id in state-msg.yml file. Exiting Now.")
+            sys.exit()
         # Once we are here, you will have the msg_id and the comment to be updated.
         target_msg_id_dict = msg_id_dict[msg_id]
-        for rec_type in target_msg_id_dict.keys():
-            if(recepient_type != "all" and recepient_type != "testall"):
-                if(rec_type != recepient_type):
-                    print("[+] Skipping the non-required recepient type : " + str(rec_type))
-                    continue
-            rec_type_issue_list = target_msg_id_dict[rec_type]
-            for issue in rec_type_issue_list:
-                repo = str(issue).split("https://github.com/")[1]
-                repo = str(repo)
-                issue_url = "https://api.github.com" + "/repos/" + repo
-                isCloseSuccess = closeIssue(issue_url=issue_url)
-                if(isCloseSuccess):
-                    print("[+] Closed Issue : " + str(issue))
-                else:
-                    print("[-] Could not close the issue : " + str(issue))
-                    print("[-] Issue URL " + str(issue_url))
+        if("comment" not in msg_id_dict[msg_id]):
+            msg_id_dict[msg_id]["comment"] = []
+        for operation_type in target_msg_id_dict.keys():
+            if(operation_type != "comment"):
+                issue_list = msg_id_dict[msg_id][operation_type]
+                for issue in issue_list:
+                    repo = str(issue).split("https://github.com/")[1]
+                    repo = str(repo)
+                    issue_url = "https://api.github.com" + "/repos/" + repo
+                    isCloseSuccess = closeIssue(issue_url=issue_url)
+                    if(isCloseSuccess):
+                        print("[+] Closed Issue : " + str(issue))
+                    else:
+                        print("[-] Could not close the issue : " + str(issue))
+                        print("[-] Issue URL " + str(issue_url))
+            elif(operation_type == "comment"):
+                msg_id_dict[msg_id]["comment"].append("Issue closed.")
+        state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
+        state_file_content = ""
+        for msg_id in msg_id_dict.keys():
+            state_file_content += str(msg_id) + ":"
+            types = msg_id_dict[msg_id]
+            for type_list in types.keys():
+                state_file_content += "\n" + " " + str(type_list) + ":"
+                for type_ in msg_id_dict[msg_id][type_list]:
+                    state_file_content += "\n" + " " + " - " + str(type_)
+            state_file_content += "\n"
+        print("state_msg_file content generated", state_file_content)
+        if(update_file(filename=state_msg_url, content=state_file_content)):
+            print("Updated state-msg.yml file")
+        else:
+            print("Unable to updated state-msg.yml file")     
     elif("comment" in sample_msg_yml_format):
         comment = sample_msg_yml_format["comment"]
         comment = str(comment).strip()
