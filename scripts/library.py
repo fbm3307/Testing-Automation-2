@@ -189,6 +189,7 @@ def main():
     '''
     # Uncomment below once in Production
     load_openshift_yaml()
+    load_yaml_test() # This is test function.
     print("Loaded OpenShift yaml file")
     # Code block for sample message file
     [sample_msg_file_content, filename] = get_yaml_from_pr(pr_url=pr_url)
