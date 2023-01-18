@@ -310,7 +310,7 @@ def main():
         for msg_id in msg_id_dict.keys():
             state_file_content += str(msg_id) + ":"
             types = msg_id_dict[msg_id]
-            for type_list in types.key():
+            for type_list in types.keys():
                 state_file_content += "\n" + " " + str(type_list) + ":"
                 for type_ in type_list:
                     state_file_content += "\n" + " " + " " + str(type_)
