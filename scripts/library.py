@@ -156,96 +156,6 @@ def create_issues_target(target="",issueTitle="", issueDescription=""):
                 output.append(issue_url)
                 print("Issue created successfully :", result[1])
     return output
-'''
-def parse_yml_file(fileContent=None):
-    global allowed_inputs
-    print("Inside parse_yml_file")
-    if(fileContent ==  None):
-        return False
-    filedata = yaml.safe_load(fileContent)
-    print("received file content : ", fileContent)
-    print("loaded yml from the string", filedata)
-
-    title = ""
-    description = ""
-    comments = ""
-    recepient_type = ""
-    operation = ""
-    global gMessageId
-    if("title" in filedata):
-        title = filedata["title"]
-    if("description" in filedata):
-        description = filedata["description"]
-    if("comments" in filedata):
-        comments = filedata["comments"]
-    if("recepient_type" in filedata):
-        recepient_type = filedata["recepient_type"]
-    if("issue_id_list" in filedata):
-        issue_id_list = filedata["issue_id_list"]
-    if("msg-id" in filedata):
-        gMessageId = filedata["msg-id"]
-    else:
-        gMessageId = str(int(time.time())) + str(random.randint(0,MAX_RANDOM)) # Newly generated random id
-    if("operation" in filedata):
-        operation = filedata["operation"]
-    else:
-        # Exit if operation variable is not present
-        print("Please pass the operation to be performed: create_issues/add_comments/close_issues")
-        sys.exit()
-    print("title:", title,"description:", description, "comments:", comments, "rec_type", recepient_type)
-    
-    if(recepient_type == None):
-        #Close all issues
-        pass
-    elif(recepient_type == "all"):
-        #Create issues in all repo (templates, image_stream)
-        #create_issues_target(target="templates", issueTitle=title, issueDescription=description)
-        #create_issues_target(target="image_streams", issueTitle=title, issueDescription=description)
-        #output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
-        #output format : List([repo_name, issue_id_url])
-        #print("[+] Executed in all")
-        return output
-    elif(recepient_type == "templates"):
-        #Create issues in all the repo present under templates
-        print("[+] Inside templates")
-        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
-        #output format : List([repo_name, issue_id_url])
-        print("[+] Executed in templates")
-        return output
-    elif(recepient_type == "image_stream"):
-        #Create issues in all the image_steram repo
-        print("[+] Inside image_stream")
-        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
-        #output format : List([repo_name, issue_id_url])
-        print("[+] Executed in image_stream")
-        return output
-    elif(recepient_type == "testimagestreams"):
-        #Create issues in test image_streams
-        print("[+] Inside testimagestreams")
-        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
-        #output format : List([repo_name, issue_id_url])
-        print("[+] Executed in testimagesteams")
-        return output
-    elif(recepient_type == "testtemplates"):
-        #Create issues in test templates
-        print("[+] Inside testtemplates")
-        if(operation == "create_issues"):
-            #output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
-            output = create_issues_target(target="testtemplates", issueTitle=title, issueDescription=description)
-            #output format : List([repo_name, issue_id_url])
-            print("[+] Executed in testtemplates ")
-            return output
-    elif(recepient_type == "testall"):
-        #Create issues in all test repos - image_stream and templates
-        print("[+] Inside testall")
-        output = target_repos(user_input=recepient_type, issueTitle=title, issueDescription=description)
-        #output format : List([repo_name, issue_id_url])
-        print("[+] Executed in testall")
-        return output
-    else:
-        #Throw error
-        pass
-'''
 
 def main():
     '''
@@ -303,7 +213,7 @@ def main():
             print("Invalid recepient type : " + str(recepient_type) + ". Exiting Now!")
             sys.exit()
     
-    # Once you reach here, you will have valid operation to perform on valid recepient_type
+    # Once we reach here, you will have valid operation to perform on valid recepient_type
     if(operation == "create_issues"):
         if("title" not in sample_msg_yml_format):
             print("Could not find the title. Exiting Now!")
@@ -376,7 +286,7 @@ def main():
                 print("Could not update sample-msg.yml file. Exiting Now!")
                 sys.exit()
         
-        # Once you are here, sample-msg.yml file should be in correct format.
+        # Once we are here, sample-msg.yml file should be in correct format.
         # Now, update state-msg.yml file with msg-id and issue-url.
         state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
         print("URL generated for state file  : " + str(state_msg_url))
@@ -418,10 +328,10 @@ def main():
             if(msg_id not in msg_id_dict):
                 print("[-] Could not find the message id in state-msg.yml file. Exiting Now.")
                 sys.exit()
-        # Once you are here, you will have the msg_id and the comment to be updated.
+        # Once we are here, you will have the msg_id and the comment to be updated.
         target_msg_id_dict = msg_id_dict[msg_id]
         for rec_type in target_msg_id_dict.keys():
-            if(recepient_type != "all" or recepient_type != "testall"):
+            if(recepient_type != "all" and recepient_type != "testall"):
                 if(rec_type != recepient_type):
                     print("[+] Skipping the non-required recepient type : " + str(rec_type))
                     continue
@@ -459,7 +369,7 @@ def main():
         # Once you are here, you will have the msg_id and the comment to be updated.
         target_msg_id_dict = msg_id_dict[msg_id]
         for rec_type in target_msg_id_dict.keys():
-            if(recepient_type != "all" or recepient_type != "testall"):
+            if(recepient_type != "all" and recepient_type != "testall"):
                 if(rec_type != recepient_type):
                     print("[+] Skipping the non-required recepient type : " + str(rec_type))
                     continue
