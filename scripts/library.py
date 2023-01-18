@@ -312,7 +312,7 @@ def main():
             types = msg_id_dict[msg_id]
             for type_list in types.keys():
                 state_file_content += "\n" + " " + str(type_list) + ":"
-                for type_ in type_list:
+                for type_ in msg_id_dict[msg_id][type_list]:
                     state_file_content += "\n" + " " + " " + str(type_)
             state_file_content += "\n"
         print("state_msg_file content generated", state_file_content)
