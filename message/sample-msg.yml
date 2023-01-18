@@ -1,6 +1,6 @@
-title: Sample Test Title
-description: Sample Description 25
-recepient_type: testimagestreams
-operation: close_issues
+title: Testing automation workflow
+description: This is testing of automation workflow.
+recepient_type: testall
+operation: create_issues
 comment: Sample Comment 1
-msg-id: 1673860296
+msg-id: 1674018269
