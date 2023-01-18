@@ -93,12 +93,18 @@ def target_repos(user_input="", issueTitle="", issueDescription=""):
     elif(user_input == "imagestreams"):
         targetDict = imageStreamDict
         print("Going to create the issue in Imagestreams target repos")
+    elif(user_input == "all"):
+        targetDict = combinedDict
+        print("Going to create the issue in All repos")
     elif(user_input == "testimagestreams"):
         targetDict = testimagestreamsDict
         print("Going to create the issue in Testimagestreams target repos")
     elif(user_input == "testtemplates"):
         targetDict = testtemplatesDict
         print("Going to create the issue in TestTemplate target repos")
+    elif(user_input == "testall"):
+        targetDict = testallDict
+        print("Going to create the issue in TestAll repos")
     else:
         print("Invalid input")
         exit()
@@ -165,8 +171,8 @@ def main():
     3. Once parsed, call the appropriate functions and execute the steps.
     '''
     # Uncomment below once in Production
-    # load_openshift_yaml()
-    # print("Loaded OpenShift yaml file")
+    load_openshift_yaml()
+    print("Loaded OpenShift yaml file")
     # Code block for sample message file
     [sample_msg_file_content, filename] = get_yaml_from_pr(pr_url=pr_url)
     if(sample_msg_file_content=="" or filename == ""):
@@ -196,7 +202,7 @@ def main():
         print("Not valid yaml content")
         print("Exiting now")
         sys.exit()
-
+    '''
     if("operation" not in sample_msg_yml_format):
         print("Operation not specified. Exiting Now")
         sys.exit()
@@ -205,6 +211,7 @@ def main():
         if(operation not in VALID_OPERATIONS):
             print("Invalid operation specified : " + str(operation) + ". Exiting Now!")
             sys.exit()
+    '''
     if("recepient_type" not in sample_msg_yml_format):
         print("Recepient Type not found")
     else:
@@ -212,9 +219,11 @@ def main():
         if(recepient_type not in VALID_RECEPIENT_TYPE):
             print("Invalid recepient type : " + str(recepient_type) + ". Exiting Now!")
             sys.exit()
-    
-    # Once we reach here, you will have valid operation to perform on valid recepient_type
-    if(operation == "create_issues"):
+
+    operation = "" #Delete this later.
+    if("msg-id" not in sample_msg_yml_format):
+        # If msg-id is not in sample-msg.yml file, we will treat that as 'create_issue' task
+        print("[+] No msg-id in the file. Creating issues!")
         if("title" not in sample_msg_yml_format):
             print("Could not find the title. Exiting Now!")
             sys.exit()
@@ -233,11 +242,8 @@ def main():
         # Now, call create_issue(recepient_type="", title="", description=""). This will return [repo-url, issue-url]
         issue_dict = {}
         if(recepient_type == "testall"):
-            issue_url_list = create_issues_target(target="testtemplates", issueTitle=title, issueDescription=description)
-            issue_dict["testtemplates"] = issue_url_list
-            issue_url_list = []
-            issue_url_list = create_issues_target(target="testimagestreams", issueTitle=title, issueDescription=description)
-            issue_dict["testimagestreams"] = issue_url_list
+            issue_url_list = create_issues_target(target="testall", issueTitle=title, issueDescription=description)
+            issue_dict["testall"] = issue_url_list
             issue_url_list = []
         elif(recepient_type == "testtemplates"):
             issue_url_list = create_issues_target(target="testtemplates", issueTitle=title, issueDescription=description)
@@ -248,11 +254,8 @@ def main():
             issue_dict["testimagestreams"] = issue_url_list
             issue_url_list = []
         elif(recepient_type == "all"):
-            issue_url_list = create_issues_target(target="templates", issueTitle=title, issueDescription=description)
-            issue_dict["templates"] = issue_url_list
-            issue_url_list = []
-            issue_url_list = create_issues_target(target="imagestreams", issueTitle=title, issueDescription=description)
-            issue_dict["imagestreams"] = issue_url_list
+            issue_url_list = create_issues_target(target="all", issueTitle=title, issueDescription=description)
+            issue_dict["all"] = issue_url_list
             issue_url_list = []
         elif(recepient_type == "templates"):
             issue_url_list = create_issues_target(target="templates", issueTitle=title, issueDescription=description)
@@ -270,21 +273,17 @@ def main():
             sys.exit()
         
         # Now, we have to update sample-msg.yml with msg-id, and update state-msg.yml file with msg-id:issue-url
-        if("msg-id" in sample_msg_yml_format):
-            msg_id = sample_msg_yml_format["msg-id"]
-            # No need to updatem sample-msg.yml file now
+        msg_id = str(int(time.time()))
+        # Now, append sample-msg.yml file
+        sample_msg_file_content +="\nmsg-id: " + str(msg_id)
+        print("Updating sample-msg.yml file")
+        fileurl = str(pr_url.split("/pulls")[0]) + "/contents/" + str(filename) + "?ref=" + str(source_branch)
+        print("File being udpated : " + str(fileurl))
+        if(update_file(filename=fileurl, content=sample_msg_file_content)):
+            print("Updated sample-msg.yml file successfully!")
         else:
-            msg_id = str(int(time.time()))
-            # Now, append sample-msg.yml file
-            sample_msg_file_content +="\nmsg-id: " + str(msg_id)
-            print("Updating sample-msg.yml file")
-            fileurl = str(pr_url.split("/pulls")[0]) + "/contents/" + str(filename) + "?ref=" + str(source_branch)
-            print("File being udpated : " + str(fileurl))
-            if(update_file(filename=fileurl, content=sample_msg_file_content)):
-                print("Updated sample-msg.yml file successfully!")
-            else:
-                print("Could not update sample-msg.yml file. Exiting Now!")
-                sys.exit()
+            print("Could not update sample-msg.yml file. Exiting Now!")
+            sys.exit()
         
         # Once we are here, sample-msg.yml file should be in correct format.
         # Now, update state-msg.yml file with msg-id and issue-url.
@@ -297,9 +296,9 @@ def main():
             print("[-] Provided message id not found. Added new message id.")
         for key in issue_dict:
             if(key in msg_id_dict[msg_id]):
-                msg_id_dict[msg_id][key].append(issue_dict[key])
+                msg_id_dict[msg_id].append(issue_dict[key])
             else:
-                msg_id_dict[msg_id][key] = issue_dict[key]
+                msg_id_dict[msg_id] = issue_dict[key]
         print("[+] Issues added to msg_id_dict")
         print("[+] msg_id_dict : ", msg_id_dict)
         print("[+] Generating the content for state_msg_file")
@@ -308,16 +307,15 @@ def main():
             state_file_content += str(msg_key) + ":"
             for rec_type in msg_id_dict[msg_key].keys():
                 rec_issue_list = msg_id_dict[msg_key][rec_type]
-                state_file_content += "\n" + " " + str(rec_type) + ":"
+                #state_file_content += "\n" + " " + str(rec_type) + ":"
                 for issue in rec_issue_list:
-                    state_file_content += "\n" + " " + " " + "- " + str(issue)
+                    state_file_content += "\n" + " " + "- " + str(issue)
             state_file_content += "\n"
         print("state_msg_file content generated", state_file_content)
         if(update_file(filename=state_msg_url, content=state_file_content)):
             print("Updated state-msg.yml file")
         else:
-            print("Unable to updaet state-msg.yml file")
-        
+            print("Unable to updaet state-msg.yml file")    
     elif(operation == "close_issues"):
         if("msg-id" not in sample_msg_yml_format):
             print("[-] No message id found to close the issues. Exiting Now.")
@@ -385,7 +383,7 @@ def main():
                     print("[-] Could not add comment for : " + str(issue))
                     print("[-] Issue URL " + str(issue_url))
     else:
-        print("Could not find operation " + str(operation)+ ". Exiting Now!")
+        print("Could not find operation  Exiting Now!")
         sys.exit()
     # Merget the Pull Request
     print("[+] Initiating the merge of pull request")
