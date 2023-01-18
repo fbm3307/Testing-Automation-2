@@ -27,7 +27,7 @@ gFilename = "" # This will be used whie updating the issue.
 gMessageId = "" # This variable will store the message id (either newly generated or previously generated)
 MAX_RANDOM = 1000000
 VALID_OPERATIONS = ["create_issues", "comment", "close_issues"]
-VALID_RECEPIENT_TYPE = ["testtemplates", "testimagestreams", "testall"]
+VALID_RECEPIENT_TYPE = ["testtemplates", "testimagestreams", "testall","templates", "imagestreams", "all"]
 PR_MERGE_COMMIT_TITLE = "Merging through workflow [skip action]"
 PR_MERGE_COMMIT_MESSAGE = "Merging through workflow [skip action]"
 
@@ -87,10 +87,7 @@ def target_repos(user_input="", issueTitle="", issueDescription=""):
         return False
     output = [] # output = {repo_url:issue_id_url}
     targetDict = {}
-    if(user_input == "all"):
-        targetDict = combinedDict
-        print("Going to create the issue in ALL combined target repos")
-    elif(user_input == "templates"):
+    if(user_input == "templates"):
         targetDict = templateDict
         print("Going to create the issue in Template target repos")
     elif(user_input == "imagestreams"):
@@ -102,9 +99,6 @@ def target_repos(user_input="", issueTitle="", issueDescription=""):
     elif(user_input == "testtemplates"):
         targetDict = testtemplatesDict
         print("Going to create the issue in TestTemplate target repos")
-    elif(user_input == "testall"):
-        targetDict = testallDict
-        print("Going to create the issue in TestAll target repos")
     else:
         print("Invalid input")
         exit()
@@ -162,7 +156,7 @@ def create_issues_target(target="",issueTitle="", issueDescription=""):
                 output.append(issue_url)
                 print("Issue created successfully :", result[1])
     return output
-
+'''
 def parse_yml_file(fileContent=None):
     global allowed_inputs
     print("Inside parse_yml_file")
@@ -251,21 +245,7 @@ def parse_yml_file(fileContent=None):
     else:
         #Throw error
         pass
-
-def update_message_file(pr_url="", filename="", filecontent=""):
-    is_updated = update_file(filename=filename, content=filecontent)
-    try:
-        if(is_updated):
-            print("Updates messaage file successfully!!")
-        else:
-            print("Could not update message file!!")   
-    except Exception as e:
-        print("Error while trying to update message file : " + str(e))
-
-def update_state_file():
-    pass
-
-
+'''
 
 def main():
     '''
@@ -299,9 +279,6 @@ def main():
     if(msg_id_dict == None):
         msg_id_dict = dict()
 
-
-
-    
     # Parse the yaml content which we got from PR
     try:
         sample_msg_yml_format = yaml.safe_load(sample_msg_file_content)
@@ -359,6 +336,21 @@ def main():
         elif(recepient_type == "testimagestreams"):
             issue_url_list = create_issues_target(target="testimagestreams", issueTitle=title, issueDescription=description)
             issue_dict["testimagestreams"] = issue_url_list
+            issue_url_list = []
+        elif(recepient_type == "all"):
+            issue_url_list = create_issues_target(target="templates", issueTitle=title, issueDescription=description)
+            issue_dict["templates"] = issue_url_list
+            issue_url_list = []
+            issue_url_list = create_issues_target(target="imagestreams", issueTitle=title, issueDescription=description)
+            issue_dict["imagestreams"] = issue_url_list
+            issue_url_list = []
+        elif(recepient_type == "templates"):
+            issue_url_list = create_issues_target(target="templates", issueTitle=title, issueDescription=description)
+            issue_dict["templates"] = issue_url_list
+            issue_url_list = []
+        elif(recepient_type == "imagestreams"):
+            issue_url_list = create_issues_target(target="imagestreams", issueTitle=title, issueDescription=description)
+            issue_dict["imagestreams"] = issue_url_list
             issue_url_list = []
         else:
             print("Could not find recepient_type. Exiting Now!")
@@ -429,7 +421,7 @@ def main():
         # Once you are here, you will have the msg_id and the comment to be updated.
         target_msg_id_dict = msg_id_dict[msg_id]
         for rec_type in target_msg_id_dict.keys():
-            if(recepient_type != "all"):
+            if(recepient_type != "all" or recepient_type != "testall"):
                 if(rec_type != recepient_type):
                     print("[+] Skipping the non-required recepient type : " + str(rec_type))
                     continue
@@ -467,7 +459,7 @@ def main():
         # Once you are here, you will have the msg_id and the comment to be updated.
         target_msg_id_dict = msg_id_dict[msg_id]
         for rec_type in target_msg_id_dict.keys():
-            if(recepient_type != "all"):
+            if(recepient_type != "all" or recepient_type != "testall"):
                 if(rec_type != recepient_type):
                     print("[+] Skipping the non-required recepient type : " + str(rec_type))
                     continue
@@ -494,38 +486,6 @@ def main():
         print("[+] Merge successfull!")
     else:
         print("[-] Could not merge the request.")
-
-
-    #update_message_file(pr_url=pr_url, filename=file_url, filecontent=file_content)
-    
-    
-    '''
-    # 1. Update sample-msg.yml file
-    print("Starting to update sample-msg.yml file")
-    file_url = str(pr_url.split("/pulls")[0]) + "/contents/" + str(yml_file) + "?ref=" + str(source_branch)
-    file_content += "\nmsg-id: " + str(gMessageId)
-    update_message_file(pr_url=pr_url, filename=file_url, filecontent=file_content)
-    print("Updated sample-msg.yml file")
-
-    
-    # 2. Update state-msg.yml file
-    final_file_content = "msg-id: " + str(gMessageId)
-    print("Starting to update state-msg.yml file")
-    outputs = parse_yml_file(fileContent=file_content) #Format List([repo-url, issue-list])
-    base_url = str(pr_url.split("/pulls")[0])
-    state_msg_url = base_url + "/state" + "/state-msg.yml?ref=main"
-    print("state_msg_url : " + str(state_msg_url))
-    for output in outputs:
-        repo_url, issue_url, target = output[0],output[1], output[2]
-        final_file_content += f""" {target} - {repo_url} : {issue_url}\n"""
-    
-    #update_state_file(pr_url=pr_url, issue_url)
-    final_file_content_yml = yaml.safe_load(final_file_content)
-    update_file(filename=state_msg_url, filecontent=final_file_content_yml)
-    print("Finished updating state-msg.yml file")
-    '''
-    
-    
 
 # File execution strats from here
 main()
