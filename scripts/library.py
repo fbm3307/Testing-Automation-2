@@ -294,22 +294,23 @@ def main():
         if(msg_id not in msg_id_dict):
             msg_id_dict[msg_id] = dict()
             print("[-] Provided message id not found. Added new message id.")
-        for key in issue_dict:
-            if(key in msg_id_dict[msg_id]):
-                msg_id_dict[msg_id].append(issue_dict[key])
-            else:
-                msg_id_dict[msg_id] = issue_dict[key]
+        for issue_list in issue_dict:
+            for issue in issue_list:
+                if(recepient_type in msg_id_dict[msg_id]):
+                    msg_id_dict[msg_id][recepient_type].append(issue)
+                else:
+                    msg_id_dict[msg_id][recepient_type] = issue
         print("[+] Issues added to msg_id_dict")
         print("[+] msg_id_dict : ", msg_id_dict)
         print("[+] Generating the content for state_msg_file")
         state_file_content = ""
-        for msg_key in msg_id_dict.keys():
-            state_file_content += str(msg_key) + ":"
-            for rec_type in msg_id_dict[msg_key].keys():
-                rec_issue_list = msg_id_dict[msg_key][rec_type]
-                #state_file_content += "\n" + " " + str(rec_type) + ":"
-                for issue in rec_issue_list:
-                    state_file_content += "\n" + " " + "- " + str(issue)
+        for msg_id in msg_id_dict.keys():
+            state_file_content += str(msg_id) + ":"
+            types = msg_id_dict[msg_id]
+            for type_list in types.key():
+                state_file_content += "\n" + " " + str(type_list) + ":"
+                for type_ in type_list:
+                    state_file_content += "\n" + " " + " " + str(type_)
             state_file_content += "\n"
         print("state_msg_file content generated", state_file_content)
         if(update_file(filename=state_msg_url, content=state_file_content)):
