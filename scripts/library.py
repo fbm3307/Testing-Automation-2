@@ -40,8 +40,8 @@ imageStreamDict = {}
 templateDict = {}
 combinedDict = {}
 testimagestreamsDict = {"testimage":["fbm3307/test-learn"], "testimagest":["fbm3307/testimagestreams1"]}
-testtemplatesDict = {"testtemplate":["fbm3307/testtemplates"]}
-testallDict = {"testimage":["fbm3307/test-learn"], "testimagest":["fbm3307/testimagestreams1"], "testtemplate":["fbm3307/testtemplates"]}
+testtemplatesDict = {"testtemplate":["fbm3307/testtemplates"], "testimage":["fbm3307/test-learn"]}
+testallDict = {}
 allowed_inputs = ["image_stream", "templates", "all"]
 
 
@@ -81,6 +81,23 @@ def load_openshift_yaml():
         combinedDict[reponame] = list(imagestreamLocationSet)
     print("completed the division of the  repos into imagestreams and templates")
 
+
+def load_yaml_test():
+    global testimagestreamsDict
+    global testtemplatesDict
+    global testallDict
+
+    print("Loading the test repo list")
+    for key in testimagestreamsDict.keys():
+        if(key not in testallDict):
+            testallDict[key] = testimagestreamsDict[key]
+
+    for key in testtemplatesDict.keys():
+        if(key not in testallDict):
+            testallDict[key] = testtemplatesDict[key]
+    
+
+    
 
 def target_repos(user_input="", issueTitle="", issueDescription=""):
     if(user_input == ""):
