@@ -295,7 +295,7 @@ def main():
             msg_id_dict[msg_id] = dict()
             print("[-] Provided message id not found. Added new message id.")
         for issue_list in issue_dict:
-            for issue in issue_list:
+            for issue in issue_dict[issue_list]:
                 if(recepient_type in msg_id_dict[msg_id]):
                     print("Found recepient_type")
                     msg_id_dict[msg_id][recepient_type].append(issue)
