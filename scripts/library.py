@@ -351,6 +351,7 @@ def main():
                         print("[-] Issue URL " + str(issue_url))
             elif(operation_type == "comment"):
                 msg_id_dict[msg_id]["comment"].append("Issue closed.")
+        state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
         state_file_content = ""
         for msg_id in msg_id_dict.keys():
             state_file_content += str(msg_id) + ":"
