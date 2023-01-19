@@ -95,10 +95,10 @@ def closeIssue(issue_url=""):
         [status, resp] = _make_gihub_request(method="patch", url=issue_url, body=body)
         if(status == SUCCESS):
             if("id" not in resp):
-                print("[-] Could not close the issue : " + str(issue_url))
+                #print("[-] Could not close the issue : " + str(issue_url))
                 return False
             else:
-                print("[+] Issue closed successfully : " + str(issue_url))
+                #print("[+] Issue closed successfully : " + str(issue_url))
                 return True
         elif(status == ERROR):
             print("[-] Error while closing the issue.")
