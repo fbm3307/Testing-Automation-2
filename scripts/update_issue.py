@@ -136,6 +136,32 @@ def update_file(filename="", content="", message="appending issue ids [skip acti
         print("Error : " + str(e))
         return False
 
+def create_file(filename="", content="", message="creating msg_id yml file [skip actions]"):
+    global ERROR
+    global SUCCESS
+    try:
+        content = getB64(content)
+        branch = str(filename.split("ref=")[1])
+        method = "put"
+        body = {"message": message,
+                "content": content,
+                "branch":branch
+                }
+        #print("Filename in target : ", filename)
+        #print("Sha Generated  : ", sha)
+        #print("Target Branch  : ", branch)
+        github_output = _make_gihub_request(method=method, url=filename, body=body, verbose=False)
+        status, message = github_output[0], github_output[1]
+        if(status == ERROR):
+            return False
+        elif(status == SUCCESS):
+            return True
+        # Should handle else?
+    except Exception as e:
+        print("Error while creating the file : " + str(filename))
+        print("Error : " + str(e))
+        return False
+
 def merge_pull_request(pr_url="", commit_title="", commit_message=""):
     pr_url += "/merge"
     body = {

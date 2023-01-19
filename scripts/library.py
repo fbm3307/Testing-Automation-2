@@ -209,9 +209,9 @@ def main():
         print("Unable to extract the content from main branch.")
         print("Exiting now")
         sys.exit()
-    msg_id_dict = yaml.safe_load(state_file_content)
-    if(msg_id_dict == None):
-        msg_id_dict = dict()
+    msg_id_list = yaml.safe_load(state_file_content)
+    if(msg_id_list == None):
+        msg_id_list = []
 
     # Parse the yaml content which we got from PR
     try:
@@ -239,6 +239,7 @@ def main():
             sys.exit()
 
     operation = "" #Delete this later.
+    msg_id_dict = {}
     if("msg-id" not in sample_msg_yml_format):
         # If msg-id is not in sample-msg.yml file, we will treat that as 'create_issue' task
         print("[+] No msg-id in the file. Creating issues!")
@@ -305,36 +306,22 @@ def main():
         
         # Once we are here, sample-msg.yml file should be in correct format.
         # Now, update state-msg.yml file with msg-id and issue-url.
-        state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
+        state_msg_url = base_url + "/contents/state" + "/" + str(msg_id) + ".yml" + "?ref="+str(source_branch)
         print("URL generated for state file  : " + str(state_msg_url))
         headers = {'Accept': 'application/vnd.github.v3+json'}
         #state_file_content = requests.get(state_msg_url, headers=headers).text
-        if(msg_id not in msg_id_dict):
-            msg_id_dict[msg_id] = dict()
-            print("[-] Provided message id not found. Added new message id.")
         for issue_list in issue_dict:
             for issue in issue_dict[issue_list]:
-                if(recepient_type in msg_id_dict[msg_id]):
-                    print("Found recepient_type")
-                    msg_id_dict[msg_id][recepient_type].append(issue)
-                else:
-                    print("Could not find recepient type. Generating now!!")
-                    print("Issue : ", issue)
-                    msg_id_dict[msg_id][recepient_type] = [issue]
+                msg_id_list.append(issue)
         print("[+] Issues added to msg_id_dict")
-        print("[+] msg_id_dict : ", msg_id_dict)
+        print("[+] msg_id_list : ", msg_id_list)
         print("[+] Generating the content for state_msg_file")
         state_file_content = ""
-        for msg_id in msg_id_dict.keys():
-            state_file_content += str(msg_id) + ":"
-            types = msg_id_dict[msg_id]
-            for type_list in types.keys():
-                state_file_content += "\n" + " " + str(type_list) + ":"
-                for type_ in msg_id_dict[msg_id][type_list]:
-                    state_file_content += "\n" + " " + " - " + str(type_)
-            state_file_content += "\n"
+        for issue_url in msg_id_list:
+            state_file_content += "- " + str(issue_url) + "\n"
+        state_file_content = state_file_content[:-1]
         print("state_msg_file content generated", state_file_content)
-        if(update_file(filename=state_msg_url, content=state_file_content)):
+        if(create_file(filename=state_msg_url, content=state_file_content)):
             print("Updated state-msg.yml file")
         else:
             print("Unable to updated state-msg.yml file")    
