@@ -373,53 +373,30 @@ def main():
             print("Unable to updated state-msg.yml file")     
     elif("comment" in sample_msg_yml_format):
         comment = sample_msg_yml_format["comment"]
-        comment = str(comment).strip()
-        if(comment == ""):
+        if(comment == []):
             print("[-] Found empty comment. Exiting Now.")
             sys.exit()
+        last_comment = comment[-1]
         msg_id = sample_msg_yml_format["msg-id"]
         print("[+] Looking for message id : " + str(msg_id))
-        if(msg_id not in msg_id_dict):
-            print("[-] Could not find the message id in state-msg.yml file. Exiting Now.")
+        state_msg_url = base_url + "/contents/state/" + str(msg_id) + ".yml?ref=main"
+        state_msg_content = read_yml_file(file_url=state_msg_url)
+        if(state_msg_content == ""):
+            print("[-] No file with given msg_id found. Exiting now!")
             sys.exit()
-        
         # Once you are here, you will have the msg_id and the comment to be updated.
-        target_msg_id_dict = msg_id_dict[msg_id]
-        if("comment" not in msg_id_dict[msg_id]):
-            msg_id_dict[msg_id]["comment"] = []
-        for operation_type in target_msg_id_dict.keys():
-            if(operation_type == "comment"):
-                # comment logic
-                msg_id_dict[msg_id]["comment"].append(comment)
+        state_msg_content_yml = yaml.safe_load(state_msg_content)
+        issue_list = state_msg_content_yml # Adding new varible for better understanding
+        for issue in issue_list:
+            repo = str(issue).split("https://github.com/")[1]
+            repo = str(repo)
+            issue_url = "https://api.github.com" + "/repos/" + repo + "/comments"
+            isCommentAdded = addComment(issue_url=issue_url, comment=last_comment)
+            if(isCommentAdded):
+                print("[+] Comment added for issue  : " + str(issue))
             else:
-                # issue list logic
-                issue_list = msg_id_dict[msg_id][operation_type]
-                for issue in issue_list:
-                    repo = str(issue).split("https://github.com/")[1]
-                    repo = str(repo)
-                    issue_url = "https://api.github.com" + "/repos/" + repo + "/comments"
-                    isCommentSuccess = addComment(issue_url=issue_url, comment=comment)
-                    if(isCommentSuccess):
-                        print("[+] Comment added for : " + str(issue))
-                    else:
-                        print("[-] Could not add comment for : " + str(issue))
-                        print("[-] Issue URL " + str(issue_url))
-        state_msg_url = base_url + "/contents/state" + "/state-msg.yml?ref="+str(source_branch)
-        state_file_content = ""
-        for msg_id in msg_id_dict.keys():
-            state_file_content += str(msg_id) + ":"
-            types = msg_id_dict[msg_id]
-            for type_list in types.keys():
-                state_file_content += "\n" + " " + str(type_list) + ":"
-                for type_ in msg_id_dict[msg_id][type_list]:
-                    state_file_content += "\n" + " " + " - " + str(type_)
-            state_file_content += "\n"
-        print("state_msg_file content generated", state_file_content)
-        if(update_file(filename=state_msg_url, content=state_file_content)):
-            print("Updated state-msg.yml file")
-        else:
-            print("Unable to updated state-msg.yml file") 
-
+                print("[-] Could not add comment for the issue  : " + str(issue))
+        print("[+] Comments added for all issues.")
     else:
         print("Could not find operation  Exiting Now!")
         sys.exit()
