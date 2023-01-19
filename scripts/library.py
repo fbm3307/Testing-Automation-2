@@ -201,17 +201,17 @@ def main():
         sys.exit()
     #  Code block for state message file
     base_url = str(pr_url.split("/pulls")[0])
-    state_msg_url_main = base_url + "/contents/state" + "/state-msg.yml?ref="+"main"
-    state_file_content = read_yml_file(file_url=state_msg_url_main)
-    if(state_file_content==""):
-        print("state_msg_url_main : ", state_msg_url_main)
-        print("state_file_content : ", sample_msg_file_content)
-        print("Unable to extract the content from main branch.")
-        print("Exiting now")
-        sys.exit()
-    msg_id_list = yaml.safe_load(state_file_content)
-    if(msg_id_list == None):
-        msg_id_list = []
+    #state_msg_url_main = base_url + "/contents/state" + "/state-msg.yml?ref="+"main"
+    #state_file_content = read_yml_file(file_url=state_msg_url_main)
+    #if(state_file_content==""):
+    #    print("state_msg_url_main : ", state_msg_url_main)
+    #    print("state_file_content : ", sample_msg_file_content)
+    #    print("Unable to extract the content from main branch.")
+    #    print("Exiting now")
+    #    sys.exit()
+    #msg_id_list = yaml.safe_load(state_file_content)
+    #if(msg_id_list == None):
+    msg_id_list = []
 
     # Parse the yaml content which we got from PR
     try:
