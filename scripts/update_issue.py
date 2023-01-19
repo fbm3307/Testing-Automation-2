@@ -70,10 +70,10 @@ def addComment(issue_url="", comment=""):
     [status, resp] = _make_gihub_request(method="post", url=issue_url, body=body)
     if(status == SUCCESS):
         if("id" not in resp):
-            print("[-] Could not add comment to issue : " + str(issue_url))
+            #print("[-] Could not add comment to issue : " + str(issue_url))
             return False
         else:
-            print("[+] Comment added successfully to issue : " + str(issue_url))
+            #print("[+] Comment added successfully to issue : " + str(issue_url))
             return True
     elif(status == ERROR):
         print("[-] Error while adding comment to the issue.")
